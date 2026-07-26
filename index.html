@@ -1,1 +1,1019 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b5d4b">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="description" content="Nicht öffentliche Entwicklungsvorschau von Servora">
+  <title>Servora Entwicklungsvorschau</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --forest: #0b5d4b;
+      --forest-dark: #073f35;
+      --action: #087f6a;
+      --blue: #1769aa;
+      --orange: #d7652d;
+      --ink: #17211f;
+      --muted: #64706d;
+      --line: #dce3e1;
+      --surface: #ffffff;
+      --background: #f3f6f5;
+      --danger: #b42318;
+      --focus: #79b8ff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--ink);
+    }
+
+    body.gate-locked { overflow: hidden; }
+
+    button, input, select, textarea { font: inherit; }
+    button, select { cursor: pointer; }
+
+    .development-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      min-height: 100vh;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        20px
+        max(24px, env(safe-area-inset-bottom));
+      display: grid;
+      place-items: center;
+      background: #edf3f1;
+    }
+
+    .gate-panel {
+      width: min(100%, 430px);
+      padding: 28px;
+      border: 1px solid #cfdad7;
+      border-top: 6px solid var(--forest);
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 18px 50px rgba(23, 33, 31, 0.14);
+    }
+
+    .gate-mark {
+      width: 52px;
+      height: 52px;
+      margin-bottom: 20px;
+      display: grid;
+      place-content: center;
+      border-radius: 8px;
+      background: #dcece7;
+      color: var(--forest);
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .gate-badge {
+      margin: 0 0 7px;
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .gate-panel h1 {
+      font-size: 32px;
+      line-height: 1.12;
+    }
+
+    .gate-copy {
+      margin: 12px 0 22px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .gate-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .gate-form .primary { margin-top: 2px; }
+
+    .gate-footnote {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .topbar {
+      min-height: 190px;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        max(20px, calc((100vw - 1040px) / 2))
+        28px;
+      display: flex;
+      align-items: flex-end;
+      background: var(--forest);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topbar.has-image {
+      min-height: 250px;
+      background-position: center;
+      background-size: cover;
+    }
+
+    .topbar.has-image::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 39, 33, 0.68);
+    }
+
+    .brand {
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      flex: 0 0 64px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.75);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.74);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 46px;
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 680px;
+      margin: 9px 0 0;
+      color: rgba(255, 255, 255, 0.82);
+      line-height: 1.45;
+    }
+
+    main {
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      padding: 24px 20px max(48px, env(safe-area-inset-bottom));
+    }
+
+    .status {
+      min-height: 300px;
+      display: grid;
+      place-content: center;
+      gap: 14px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      margin: auto;
+      border: 3px solid var(--line);
+      border-top-color: var(--action);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .section {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-child { border-bottom: 0; }
+
+    h2, h3 {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    h2 { font-size: 22px; }
+    h3 { font-size: 17px; }
+
+    .section-copy {
+      margin: 5px 0 18px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 12px;
+      border: 1px solid #b9c5c2;
+      border-radius: 7px;
+      background: white;
+      color: var(--ink);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus, button:focus-visible {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 35%, transparent);
+    }
+
+    .guest-control {
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: 46px 1fr 46px;
+      align-items: center;
+      border: 1px solid #b9c5c2;
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .guest-control button {
+      height: 100%;
+      border: 0;
+      background: #eef4f2;
+      color: var(--forest);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .guest-value {
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .slots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .slot {
+      min-height: 44px;
+      padding: 8px;
+      border: 1px solid #b9c5c2;
+      border-radius: 7px;
+      background: white;
+      color: var(--ink);
+      font-weight: 650;
+    }
+
+    .slot[aria-pressed="true"] {
+      border-color: var(--action);
+      background: var(--action);
+      color: white;
+    }
+
+    .empty-slots {
+      margin-top: 14px;
+      padding: 14px;
+      border-left: 4px solid var(--orange);
+      background: #fff5ef;
+      color: #71391d;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .summary-row span:first-child { color: var(--muted); }
+    .summary-row strong { text-align: right; }
+
+    .check {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 9px;
+      align-items: start;
+      margin: 18px 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .check input {
+      min-height: auto;
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      accent-color: var(--action);
+    }
+
+    .primary, .secondary {
+      width: 100%;
+      min-height: 50px;
+      padding: 11px 16px;
+      border-radius: 7px;
+      font-weight: 750;
+    }
+
+    .primary {
+      border: 1px solid var(--action);
+      background: var(--action);
+      color: white;
+    }
+
+    .primary:disabled {
+      border-color: #b9c5c2;
+      background: #dce3e1;
+      color: #6f7a77;
+      cursor: not-allowed;
+    }
+
+    .secondary {
+      margin-top: 10px;
+      border: 1px solid #b9c5c2;
+      background: white;
+      color: var(--forest);
+    }
+
+    .notice {
+      padding: 12px 14px;
+      border-left: 4px solid var(--danger);
+      background: #fff1f0;
+      color: var(--danger);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .restaurant-info {
+      display: grid;
+      gap: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .restaurant-info strong { color: var(--ink); }
+
+    .confirmation {
+      max-width: 620px;
+      margin: 30px auto;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-top: 6px solid var(--action);
+      border-radius: 8px;
+      background: white;
+      text-align: center;
+    }
+
+    .confirmation-mark {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-content: center;
+      border-radius: 50%;
+      background: #dff5ed;
+      color: var(--forest);
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .confirmation-code {
+      margin: 18px 0;
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--forest);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 760px) {
+      .topbar { min-height: 170px; }
+      h1 { font-size: 34px; }
+      .brand { align-items: center; }
+      .logo { width: 52px; height: 52px; flex-basis: 52px; }
+      main { padding: 16px 12px 40px; }
+      .layout { grid-template-columns: 1fr; }
+      .field-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .section { padding: 18px 15px; }
+      .side-panel { order: -1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body class="gate-locked">
+  <section class="development-gate" id="development-gate" aria-labelledby="gate-title">
+    <div class="gate-panel">
+      <div class="gate-mark" aria-hidden="true">S</div>
+      <p class="gate-badge">Nicht öffentlich</p>
+      <h1 id="gate-title">Entwicklungsvorschau</h1>
+      <p class="gate-copy">
+        Diese Website befindet sich in Entwicklung und ist noch nicht für die Öffentlichkeit
+        freigegeben. Der Zugang ist ausschließlich für autorisierte Tests vorgesehen.
+      </p>
+      <form class="gate-form" id="gate-form">
+        <label for="development-pin">Zugangs-PIN</label>
+        <input
+          id="development-pin"
+          type="password"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="8"
+          autocomplete="off"
+          required
+          aria-describedby="gate-error"
+        >
+        <div class="notice hidden" id="gate-error" role="alert">
+          Der eingegebene PIN ist nicht korrekt.
+        </div>
+        <button class="primary" type="submit" id="gate-submit">Vorschau öffnen</button>
+      </form>
+      <p class="gate-footnote">
+        Bitte gib den Link und den PIN nicht öffentlich weiter.
+      </p>
+    </div>
+  </section>
+
+  <div id="site-content" inert aria-hidden="true">
+    <header class="topbar" id="topbar">
+      <div class="brand">
+        <img class="logo hidden" id="logo" alt="">
+        <div>
+          <p class="eyebrow">Online-Reservierung</p>
+          <h1 id="restaurant-name">Servora</h1>
+          <p class="subtitle" id="restaurant-description">Reservierungsdaten werden geladen.</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+    <div class="status" id="loading" role="status">
+      <div class="spinner" aria-hidden="true"></div>
+      <span>Freie Zeiten werden geladen</span>
+    </div>
+
+    <div class="status hidden" id="fatal">
+      <h2>Reservierung nicht verfügbar</h2>
+      <p id="fatal-message">Der Link ist unvollständig oder nicht mehr gültig.</p>
+    </div>
+
+    <form class="layout hidden" id="booking-form">
+      <div class="panel">
+        <section class="section">
+          <h2>Tisch finden</h2>
+          <p class="section-copy">Wähle Personenanzahl, Datum und Wunschbereich.</p>
+          <div class="field-grid">
+            <div class="field">
+              <label for="guests">Personen</label>
+              <div class="guest-control">
+                <button type="button" id="guests-minus" aria-label="Eine Person weniger">−</button>
+                <div class="guest-value" id="guests-value" aria-live="polite">2 Personen</div>
+                <button type="button" id="guests-plus" aria-label="Eine Person mehr">+</button>
+              </div>
+              <input type="hidden" id="guests" value="2">
+            </div>
+            <div class="field">
+              <label for="date">Datum</label>
+              <input type="date" id="date" required>
+            </div>
+            <div class="field full">
+              <label for="area">Bereich</label>
+              <select id="area" required></select>
+            </div>
+          </div>
+          <div class="slots" id="slots" aria-label="Verfügbare Uhrzeiten"></div>
+          <div class="empty-slots hidden" id="empty-slots">
+            Für diese Auswahl ist aktuell kein Tisch verfügbar.
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Deine Angaben</h2>
+          <p class="section-copy">Das Restaurant verwendet diese Daten nur für die Reservierung.</p>
+          <div class="field-grid" id="contact-fields">
+            <div class="field" data-public-field="Vorname">
+              <label for="first-name">Vorname</label>
+              <input id="first-name" autocomplete="given-name">
+            </div>
+            <div class="field" data-public-field="Nachname">
+              <label for="last-name">Nachname</label>
+              <input id="last-name" autocomplete="family-name">
+            </div>
+            <div class="field" data-public-field="E-Mail-Adresse">
+              <label for="email">E-Mail-Adresse</label>
+              <input type="email" id="email" autocomplete="email">
+            </div>
+            <div class="field" data-public-field="Telefonnummer">
+              <label for="phone">Telefonnummer</label>
+              <input type="tel" id="phone" autocomplete="tel">
+            </div>
+            <div class="field full" data-public-field="Anlass">
+              <label for="occasion">Anlass</label>
+              <input id="occasion" autocomplete="off">
+            </div>
+            <div class="field full" data-public-field="Hinweise">
+              <label for="notes">Hinweise</label>
+              <textarea id="notes"></textarea>
+            </div>
+            <div class="field full" data-public-field="Freiwillige Allergiehinweise">
+              <label for="allergies">Freiwillige Allergiehinweise</label>
+              <textarea id="allergies"></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="panel side-panel">
+        <section class="section">
+          <h3>Deine Reservierung</h3>
+          <div class="summary-list">
+            <div class="summary-row"><span>Personen</span><strong id="summary-guests">2</strong></div>
+            <div class="summary-row"><span>Datum</span><strong id="summary-date">–</strong></div>
+            <div class="summary-row"><span>Uhrzeit</span><strong id="summary-time">–</strong></div>
+            <div class="summary-row"><span>Bereich</span><strong id="summary-area">–</strong></div>
+          </div>
+          <label class="check">
+            <input type="checkbox" id="privacy" required>
+            <span>Ich stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Reservierung zu.</span>
+          </label>
+          <div class="notice hidden" id="form-error" role="alert"></div>
+          <button class="primary" type="submit" id="submit" disabled>Reservierung anfragen</button>
+          <button class="secondary" type="button" id="open-app">In Servora öffnen</button>
+        </section>
+        <section class="section restaurant-info" id="restaurant-info"></section>
+      </aside>
+    </form>
+
+    <section class="confirmation hidden" id="confirmation" aria-live="polite">
+      <div class="confirmation-mark" aria-hidden="true">✓</div>
+      <h2 id="confirmation-title">Reservierung eingegangen</h2>
+      <div class="confirmation-code" id="confirmation-code"></div>
+      <p id="confirmation-message"></p>
+      <button class="secondary" type="button" id="new-booking">Weitere Reservierung</button>
+    </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SUPABASE_URL = "https://dlapwemckfhxklytbqkk.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_VeeQLARNn-sULZ4snvp3HA_Hd78H5RN";
+      const DEVELOPMENT_PIN_HASH =
+        "5f20b9b81da6a3163f1cc96b603868330378255157dae99d8a6d7cc5fa3d6a19";
+      const ACCESS_SESSION_KEY = "servora-development-access";
+      const params = new URLSearchParams(window.location.search);
+      const publicID = params.get("r");
+
+      const state = {
+        snapshot: null,
+        guests: 2,
+        selectedTime: null
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const loading = $("loading");
+      const fatal = $("fatal");
+      const form = $("booking-form");
+      const settingsPath = ["restaurant", "settings"];
+
+      async function sha256(value) {
+        const bytes = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest("SHA-256", bytes);
+        return [...new Uint8Array(digest)]
+          .map((byte) => byte.toString(16).padStart(2, "0"))
+          .join("");
+      }
+
+      function openDevelopmentPreview() {
+        $("development-gate").classList.add("hidden");
+        $("site-content").removeAttribute("inert");
+        $("site-content").removeAttribute("aria-hidden");
+        document.body.classList.remove("gate-locked");
+        start();
+      }
+
+      async function submitDevelopmentPIN(event) {
+        event.preventDefault();
+        const input = $("development-pin");
+        const button = $("gate-submit");
+        const error = $("gate-error");
+        button.disabled = true;
+        error.classList.add("hidden");
+
+        const enteredHash = await sha256(input.value.trim());
+        if (enteredHash === DEVELOPMENT_PIN_HASH) {
+          sessionStorage.setItem(ACCESS_SESSION_KEY, "granted");
+          openDevelopmentPreview();
+          return;
+        }
+
+        input.value = "";
+        input.setAttribute("aria-invalid", "true");
+        error.classList.remove("hidden");
+        button.disabled = false;
+        input.focus();
+      }
+
+      function nested(object, path, fallback) {
+        let value = object;
+        for (const key of path) value = value?.[key];
+        return value ?? fallback;
+      }
+
+      function showFatal(message) {
+        loading.classList.add("hidden");
+        form.classList.add("hidden");
+        fatal.classList.remove("hidden");
+        $("fatal-message").textContent = message;
+      }
+
+      function dateInputValue(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function parseLocalDate(value) {
+        const [year, month, day] = value.split("-").map(Number);
+        return new Date(year, month - 1, day, 12, 0, 0);
+      }
+
+      function daySettings(date) {
+        const weekday = date.getDay() + 1;
+        return nested(state.snapshot, [...settingsPath, "dayAvailability"], [])
+          .find((day) => Number(day.id) === weekday);
+      }
+
+      function eligibleTables(area) {
+        return (state.snapshot.tables || []).filter((table) =>
+          table.isOnlineBookable &&
+          !table.isPlaceholder &&
+          table.area === area &&
+          Number(table.capacity) >= state.guests
+        );
+      }
+
+      function overlaps(slot, reservation, durationMinutes) {
+        if (!["Geplant", "Platziert"].includes(reservation.status)) return false;
+        if (reservation.area && reservation.area !== $("area").value) return false;
+        const time = new Date(reservation.date);
+        return Math.abs(time.getTime() - slot.getTime()) < durationMinutes * 60_000;
+      }
+
+      function formatTime(date) {
+        return new Intl.DateTimeFormat("de-DE", {
+          hour: "2-digit",
+          minute: "2-digit"
+        }).format(date);
+      }
+
+      function renderSlots() {
+        const container = $("slots");
+        const empty = $("empty-slots");
+        container.replaceChildren();
+        state.selectedTime = null;
+
+        const date = parseLocalDate($("date").value);
+        const day = daySettings(date);
+        const area = $("area").value;
+        const tables = eligibleTables(area);
+        const settings = nested(state.snapshot, settingsPath, {});
+        const interval = Math.max(Number(settings.slotIntervalMinutes || 15), 15);
+        const duration = Math.max(Number(settings.standardDurationMinutes || 90), 15);
+        const lead = Number(settings.minimumLeadMinutes || 0) * 60_000;
+        const earliest = Date.now() + lead;
+        const slots = [];
+
+        if (day?.isOpen && tables.length) {
+          for (const window of day.windows || []) {
+            for (
+              let minutes = Number(window.startMinutes);
+              minutes <= Number(window.endMinutes);
+              minutes += interval
+            ) {
+              const slot = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                Math.floor(minutes / 60),
+                minutes % 60,
+                0
+              );
+              if (slot.getTime() < earliest) continue;
+              const occupied = (state.snapshot.reservations || [])
+                .filter((reservation) => overlaps(slot, reservation, duration))
+                .length;
+              if (occupied < tables.length) slots.push(slot);
+            }
+          }
+        }
+
+        empty.classList.toggle("hidden", slots.length > 0);
+        for (const slot of slots) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "slot";
+          button.textContent = formatTime(slot);
+          button.setAttribute("aria-pressed", "false");
+          button.addEventListener("click", () => {
+            for (const current of container.querySelectorAll(".slot")) {
+              current.setAttribute("aria-pressed", "false");
+            }
+            button.setAttribute("aria-pressed", "true");
+            state.selectedTime = slot;
+            updateSummary();
+          });
+          container.append(button);
+        }
+        updateSummary();
+      }
+
+      function updateGuests(delta) {
+        const maximum = Number(nested(state.snapshot, [...settingsPath, "maximumPartySize"], 10));
+        state.guests = Math.min(maximum, Math.max(1, state.guests + delta));
+        $("guests").value = String(state.guests);
+        $("guests-value").textContent = `${state.guests} ${state.guests === 1 ? "Person" : "Personen"}`;
+        renderSlots();
+      }
+
+      function updateSummary() {
+        const date = parseLocalDate($("date").value);
+        $("summary-guests").textContent = String(state.guests);
+        $("summary-date").textContent = new Intl.DateTimeFormat("de-DE", {
+          weekday: "short",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }).format(date);
+        $("summary-time").textContent = state.selectedTime ? formatTime(state.selectedTime) : "–";
+        $("summary-area").textContent = $("area").value || "–";
+        validate();
+      }
+
+      function applyFieldRules() {
+        const rules = nested(state.snapshot, [...settingsPath, "fieldVisibility"], {});
+        for (const wrapper of document.querySelectorAll("[data-public-field]")) {
+          const visibility = rules[wrapper.dataset.publicField] || "Ausgeblendet";
+          const control = wrapper.querySelector("input, textarea");
+          wrapper.classList.toggle("hidden", visibility === "Ausgeblendet");
+          control.required = visibility === "Pflichtfeld";
+          if (visibility === "Optional") {
+            wrapper.querySelector("label").textContent =
+              `${wrapper.dataset.publicField} (optional)`;
+          }
+        }
+      }
+
+      function validate() {
+        const visibleRequired = [...form.querySelectorAll("input[required], textarea[required], select[required]")]
+          .filter((element) => !element.closest(".hidden"));
+        const fieldsValid = visibleRequired.every((element) =>
+          element.type === "checkbox" ? element.checked : element.value.trim() !== ""
+        );
+        const contactValid = $("email").value.trim() !== "" || $("phone").value.trim() !== "";
+        $("submit").disabled = !(state.selectedTime && fieldsValid && contactValid);
+      }
+
+      function configureRestaurant(snapshot) {
+        const restaurant = snapshot.restaurant;
+        const settings = restaurant.settings;
+        document.title = `Reservieren bei ${restaurant.name}`;
+        $("restaurant-name").textContent = restaurant.name;
+        $("restaurant-description").textContent =
+          restaurant.description || "Schnell und verbindlich einen Tisch anfragen.";
+
+        if (restaurant.titleImageData) {
+          $("topbar").style.backgroundImage =
+            `url(data:image/jpeg;base64,${restaurant.titleImageData})`;
+          $("topbar").classList.add("has-image");
+        }
+        if (restaurant.logoData) {
+          $("logo").src = `data:image/jpeg;base64,${restaurant.logoData}`;
+          $("logo").alt = `Logo von ${restaurant.name}`;
+          $("logo").classList.remove("hidden");
+        }
+
+        const today = new Date();
+        const maximumDate = new Date();
+        maximumDate.setDate(today.getDate() + Number(settings.maximumAdvanceDays || 90));
+        const firstDate = settings.allowsSameDay
+          ? today
+          : new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+        $("date").min = dateInputValue(firstDate);
+        $("date").max = dateInputValue(maximumDate);
+        $("date").value = dateInputValue(firstDate);
+
+        const bookableAreas = [...new Set(
+          (snapshot.tables || [])
+            .filter((table) => table.isOnlineBookable && !table.isPlaceholder)
+            .map((table) => table.area)
+        )];
+        const configured = settings.allowedAreas?.length
+          ? settings.allowedAreas.filter((area) => bookableAreas.includes(area))
+          : bookableAreas;
+        $("area").replaceChildren(...configured.map((area) => {
+          const option = document.createElement("option");
+          option.value = area;
+          option.textContent = area;
+          return option;
+        }));
+
+        const info = [];
+        if (restaurant.address) info.push(`<div><strong>Adresse</strong><br>${escapeHTML(restaurant.address)}</div>`);
+        if (restaurant.openingHoursText) info.push(`<div><strong>Öffnungszeiten</strong><br>${escapeHTML(restaurant.openingHoursText)}</div>`);
+        if (restaurant.phone) info.push(`<div><strong>Telefon</strong><br><a href="tel:${encodeURIComponent(restaurant.phone)}">${escapeHTML(restaurant.phone)}</a></div>`);
+        $("restaurant-info").innerHTML = info.join("");
+        $("restaurant-info").classList.toggle("hidden", info.length === 0);
+
+        $("open-app").addEventListener("click", () => {
+          window.location.href = `servora://reservieren?r=${encodeURIComponent(publicID)}`;
+        });
+
+        applyFieldRules();
+        renderSlots();
+      }
+
+      function escapeHTML(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      async function rpc(name, body) {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.message || "Die Anfrage ist fehlgeschlagen.");
+        return data;
+      }
+
+      async function submit(event) {
+        event.preventDefault();
+        validate();
+        if ($("submit").disabled || !state.selectedTime) return;
+
+        $("submit").disabled = true;
+        $("submit").textContent = "Wird gesendet …";
+        $("form-error").classList.add("hidden");
+
+        try {
+          const result = await rpc("create_public_reservation", {
+            p_public_id: publicID,
+            p_request_id: crypto.randomUUID(),
+            p_guests: state.guests,
+            p_starts_at: state.selectedTime.toISOString(),
+            p_area: $("area").value,
+            p_first_name: $("first-name").value.trim(),
+            p_last_name: $("last-name").value.trim(),
+            p_email: $("email").value.trim(),
+            p_phone: $("phone").value.trim(),
+            p_occasion: $("occasion").value.trim(),
+            p_notes: $("notes").value.trim(),
+            p_allergies: $("allergies").value.trim(),
+            p_accepts_privacy: $("privacy").checked,
+            p_source: "website"
+          });
+          form.classList.add("hidden");
+          $("confirmation").classList.remove("hidden");
+          $("confirmation-title").textContent = result.isConfirmed
+            ? "Reservierung bestätigt"
+            : "Anfrage eingegangen";
+          $("confirmation-code").textContent = result.confirmationNumber;
+          $("confirmation-message").textContent = result.message;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (error) {
+          $("form-error").textContent =
+            error.message.includes("available")
+              ? "Diese Uhrzeit wurde gerade vergeben. Bitte wähle eine andere Zeit."
+              : error.message;
+          $("form-error").classList.remove("hidden");
+          $("submit").disabled = false;
+          $("submit").textContent = "Reservierung anfragen";
+        }
+      }
+
+      async function start() {
+        if (!publicID || !/^[0-9a-f-]{36}$/i.test(publicID)) {
+          showFatal("Dieser Reservierungslink ist unvollständig.");
+          return;
+        }
+        try {
+          state.snapshot = await rpc("get_public_booking_snapshot", {
+            p_public_id: publicID
+          });
+          if (!state.snapshot?.restaurant?.settings?.bookingEnabled) {
+            showFatal("Dieses Restaurant nimmt momentan keine Online-Reservierungen an.");
+            return;
+          }
+          loading.classList.add("hidden");
+          form.classList.remove("hidden");
+          configureRestaurant(state.snapshot);
+        } catch {
+          showFatal("Das Restaurant konnte nicht geladen werden. Prüfe den Link und versuche es erneut.");
+        }
+      }
+
+      $("guests-minus").addEventListener("click", () => updateGuests(-1));
+      $("guests-plus").addEventListener("click", () => updateGuests(1));
+      $("date").addEventListener("change", renderSlots);
+      $("area").addEventListener("change", renderSlots);
+      form.addEventListener("input", validate);
+      form.addEventListener("submit", submit);
+      $("new-booking").addEventListener("click", () => window.location.reload());
+      $("gate-form").addEventListener("submit", submitDevelopmentPIN);
+
+      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "granted") {
+        openDevelopmentPreview();
+      } else {
+        $("development-pin").focus();
+      }
+    })();
+  </script>
+</body>
+</html>
 
