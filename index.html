@@ -744,6 +744,61 @@
       gap: 10px;
     }
 
+    .rating-form {
+      max-width: 520px;
+      margin: 24px auto 0;
+      text-align: left;
+    }
+
+    .rating-stars {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 12px 0 22px;
+      padding: 0;
+      border: 0;
+    }
+
+    .rating-stars legend {
+      width: 100%;
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: 750;
+    }
+
+    .rating-stars input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .rating-stars label {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: white;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 25px;
+      transition: transform 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .rating-stars input:checked + label {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+      color: var(--orange);
+      transform: translateY(-2px);
+    }
+
+    .rating-stars input:focus-visible + label {
+      outline: 3px solid color-mix(in srgb, var(--action) 30%, transparent);
+      outline-offset: 2px;
+    }
+
     .site-footer {
       padding:
         28px
@@ -1259,7 +1314,47 @@
         <div class="notice error hidden" id="cancellation-error" role="alert"></div>
         <div class="confirmation-actions">
           <button class="secondary" type="button" id="back-to-booking">Zur Reservierungsseite</button>
+          <button class="secondary hidden" type="button" id="review-visit">Besuch bewerten</button>
           <button class="primary" type="button" id="cancel-reservation">Reservierung stornieren</button>
+        </div>
+      </section>
+
+      <section class="confirmation hidden" id="review-manager" aria-live="polite">
+        <div class="confirmation-mark" aria-hidden="true">★</div>
+        <h2 id="review-title">Wie war dein Besuch?</h2>
+        <div class="confirmation-code" id="review-code"></div>
+        <p>Deine Rückmeldung geht direkt an das Restaurant.</p>
+        <form class="rating-form" id="review-form">
+          <fieldset class="rating-stars">
+            <legend>Bewertung</legend>
+            <input type="radio" name="rating" id="rating-1" value="1" required>
+            <label for="rating-1" aria-label="1 Stern">1</label>
+            <input type="radio" name="rating" id="rating-2" value="2">
+            <label for="rating-2" aria-label="2 Sterne">2</label>
+            <input type="radio" name="rating" id="rating-3" value="3">
+            <label for="rating-3" aria-label="3 Sterne">3</label>
+            <input type="radio" name="rating" id="rating-4" value="4">
+            <label for="rating-4" aria-label="4 Sterne">4</label>
+            <input type="radio" name="rating" id="rating-5" value="5">
+            <label for="rating-5" aria-label="5 Sterne">5</label>
+          </fieldset>
+          <label class="field">
+            <span>Kommentar <small>optional</small></span>
+            <textarea id="review-comment" maxlength="2000" rows="5"
+              placeholder="Was hat dir gefallen? Was können wir verbessern?"></textarea>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="review-contact">
+            <span>Das Restaurant darf mich zu dieser Rückmeldung kontaktieren.</span>
+          </label>
+          <div class="notice error hidden" id="review-error" role="alert"></div>
+          <div class="confirmation-actions">
+            <button class="secondary" type="button" id="review-back">Zurück</button>
+            <button class="primary" type="submit" id="submit-review">Bewertung senden</button>
+          </div>
+        </form>
+        <div class="notice success hidden" id="review-success" role="status">
+          Danke. Deine Bewertung wurde sicher übermittelt.
         </div>
       </section>
     </main>
@@ -1765,6 +1860,7 @@
       const params = new URLSearchParams(window.location.search);
       const publicID = params.get("r");
       const cancellationToken = params.get("cancel");
+      const reviewCode = params.get("review");
       const requestedLegalDocument = window.location.hash.slice(1);
       let siteStarted = false;
 
@@ -1775,7 +1871,8 @@
         selectedIsWaitlist: false,
         step: 1,
         confirmationNumber: "",
-        cancellationToken: null
+        cancellationToken: null,
+        reviewCode: reviewCode || ""
       };
 
       const $ = (id) => document.getElementById(id);
@@ -2385,6 +2482,11 @@
           );
           $("cancel-reservation").disabled = !reservation.canCancel;
           $("cancel-reservation").classList.toggle("hidden", !reservation.canCancel);
+          state.reviewCode = reservation.confirmationNumber;
+          $("review-visit").classList.toggle(
+            "hidden",
+            reservation.status !== "completed"
+          );
           $("cancellation-message").textContent = reservation.canCancel
             ? "Du kannst diese Reservierung hier verbindlich stornieren."
             : reservation.status === "cancelled"
@@ -2424,6 +2526,52 @@
         }
       }
 
+      function openReview(code) {
+        state.reviewCode = String(code || "").trim().toUpperCase();
+        $("loading").classList.add("hidden");
+        $("fatal").classList.add("hidden");
+        form.classList.add("hidden");
+        $("stepbar").classList.add("hidden");
+        $("confirmation").classList.add("hidden");
+        $("cancellation-manager").classList.add("hidden");
+        $("review-manager").classList.remove("hidden");
+        $("review-code").textContent = state.reviewCode;
+      }
+
+      async function submitReview(event) {
+        event.preventDefault();
+        const rating = new FormData(event.currentTarget).get("rating");
+        const button = $("submit-review");
+        $("review-error").classList.add("hidden");
+        if (!rating) {
+          $("review-error").textContent = "Bitte wähle zuerst eine Bewertung.";
+          $("review-error").classList.remove("hidden");
+          return;
+        }
+        button.disabled = true;
+        button.textContent = "Wird gesendet …";
+        try {
+          await rpc("submit_guest_review", {
+            p_confirmation_code: state.reviewCode,
+            p_rating: Number(rating),
+            p_comment: $("review-comment").value.trim(),
+            p_contact_requested: $("review-contact").checked
+          });
+          event.currentTarget.classList.add("hidden");
+          $("review-success").classList.remove("hidden");
+          $("review-title").textContent = "Vielen Dank";
+        } catch (error) {
+          $("review-error").textContent = error.message.includes("after the visit")
+            ? "Eine Bewertung ist nach dem abgeschlossenen Besuch möglich."
+            : error.message.includes("duplicate")
+              ? "Für diese Reservierung wurde bereits eine Bewertung abgegeben."
+              : "Die Bewertung konnte nicht gespeichert werden. Bitte versuche es erneut.";
+          $("review-error").classList.remove("hidden");
+          button.disabled = false;
+          button.textContent = "Bewertung senden";
+        }
+      }
+
       function updateOnlineStatus() {
         $("offline-banner").classList.toggle("hidden", navigator.onLine);
       }
@@ -2453,6 +2601,10 @@
       }
 
       async function start() {
+        if (reviewCode && /^SVR-[A-Z0-9]{6}$/i.test(reviewCode)) {
+          openReview(reviewCode);
+          return;
+        }
         if (cancellationToken && /^[0-9a-f-]{36}$/i.test(cancellationToken)) {
           await loadCancellation();
           return;
@@ -2513,6 +2665,16 @@
           `${window.location.pathname}?cancel=${encodeURIComponent(state.cancellationToken)}`;
       });
       $("cancel-reservation").addEventListener("click", cancelReservation);
+      $("review-visit").addEventListener("click", () => openReview(state.reviewCode));
+      $("review-form").addEventListener("submit", submitReview);
+      $("review-back").addEventListener("click", () => {
+        if (cancellationToken) {
+          $("review-manager").classList.add("hidden");
+          $("cancellation-manager").classList.remove("hidden");
+        } else {
+          window.location.href = window.location.pathname;
+        }
+      });
       $("back-to-booking").addEventListener("click", () => {
         window.location.href = publicID
           ? `${window.location.pathname}?r=${encodeURIComponent(publicID)}`
