@@ -157,6 +157,7 @@
 
     .gate-foot button,
     .site-footer button,
+    .site-footer a,
     .inline-link {
       padding: 0;
       border: 0;
@@ -1240,7 +1241,7 @@
             </div>
             <div class="review-block">
               <h3>Kontakt</h3>
-              <dl class="summary-list" id="review-contact"></dl>
+              <dl class="summary-list" id="review-contact-summary"></dl>
             </div>
 
             <label class="check">
@@ -1366,6 +1367,7 @@
           Sichere Restaurantorganisation und Online-Reservierungen.
         </div>
         <div class="footer-links">
+          <a href="./dashboard/">Servora Web</a>
           <button type="button" data-legal="support">Support</button>
           <button type="button" data-legal="veroeffentlichung">Veröffentlichung</button>
           <button type="button" data-legal="impressum">Impressum</button>
@@ -2160,7 +2162,7 @@
           [$("postal-code").value.trim(), $("city").value.trim()]
             .filter(Boolean).join(" ")
         ].filter(Boolean).join(", ");
-        const contact = $("review-contact");
+        const contact = $("review-contact-summary");
         contact.replaceChildren(
           summaryRow("Name", name),
           summaryRow("E-Mail", $("email").value.trim()),
