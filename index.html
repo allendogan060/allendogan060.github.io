@@ -3,30 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b5d4b">
+  <meta name="theme-color" content="#0a5a49">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <meta name="description" content="Nicht öffentliche Entwicklungsvorschau von Servora">
-  <title>Servora Entwicklungsvorschau</title>
+  <meta name="description" content="Online einen Tisch reservieren – bereitgestellt mit Servora.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a5a49'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-size='36' font-weight='700' fill='white'%3ES%3C/text%3E%3C/svg%3E">
+  <title>Servora Online-Reservierung</title>
   <style>
     :root {
       color-scheme: light;
-      --forest: #0b5d4b;
-      --forest-dark: #073f35;
-      --action: #087f6a;
+      --forest: #0a5a49;
+      --forest-deep: #063c32;
+      --action: #087966;
+      --action-soft: #e1f1ec;
+      --orange: #dc702d;
+      --orange-soft: #fff0e6;
       --blue: #1769aa;
-      --orange: #d7652d;
-      --ink: #17211f;
-      --muted: #64706d;
-      --line: #dce3e1;
-      --surface: #ffffff;
-      --background: #f3f6f5;
       --danger: #b42318;
-      --focus: #79b8ff;
+      --danger-soft: #fff1f0;
+      --success: #147d5a;
+      --ink: #15201d;
+      --muted: #63706c;
+      --line: #d8e1de;
+      --surface: #ffffff;
+      --surface-muted: #f4f7f6;
+      --background: #edf2f0;
+      --focus: #69aef0;
+      --content: 1120px;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -34,159 +42,271 @@
       min-height: 100vh;
       background: var(--background);
       color: var(--ink);
+      letter-spacing: 0;
     }
 
     body.gate-locked { overflow: hidden; }
 
     button, input, select, textarea { font: inherit; }
     button, select { cursor: pointer; }
+    button { touch-action: manipulation; }
+    a { color: var(--action); }
+    img { display: block; max-width: 100%; }
+    [hidden], .hidden { display: none !important; }
+
+    :focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+      outline-offset: 2px;
+    }
 
     .development-gate {
       position: fixed;
       inset: 0;
       z-index: 1000;
-      min-height: 100vh;
+      min-height: 100dvh;
       padding:
-        max(24px, env(safe-area-inset-top))
-        20px
-        max(24px, env(safe-area-inset-bottom));
+        max(22px, env(safe-area-inset-top))
+        18px
+        max(22px, env(safe-area-inset-bottom));
       display: grid;
       place-items: center;
-      background: #edf3f1;
+      background:
+        linear-gradient(145deg, rgba(10, 90, 73, 0.08), transparent 45%),
+        var(--background);
     }
 
     .gate-panel {
-      width: min(100%, 430px);
-      padding: 28px;
-      border: 1px solid #cfdad7;
-      border-top: 6px solid var(--forest);
+      width: min(100%, 460px);
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: white;
-      box-shadow: 0 18px 50px rgba(23, 33, 31, 0.14);
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: 0 22px 65px rgba(21, 32, 29, 0.14);
     }
 
-    .gate-mark {
-      width: 52px;
-      height: 52px;
-      margin-bottom: 20px;
-      display: grid;
-      place-content: center;
-      border-radius: 8px;
-      background: #dcece7;
-      color: var(--forest);
-      font-size: 25px;
+    .gate-accent {
+      height: 8px;
+      background: var(--forest);
+    }
+
+    .gate-content { padding: 30px; }
+
+    .servora-wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--forest-deep);
+      font-size: 18px;
       font-weight: 800;
     }
 
+    .servora-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--forest);
+      color: white;
+      font-weight: 850;
+    }
+
     .gate-badge {
-      margin: 0 0 7px;
+      margin: 28px 0 8px;
       color: var(--orange);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
     }
 
     .gate-panel h1 {
+      margin: 0;
       font-size: 32px;
       line-height: 1.12;
     }
 
     .gate-copy {
-      margin: 12px 0 22px;
+      margin: 12px 0 24px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
     .gate-form {
       display: grid;
-      gap: 12px;
+      gap: 11px;
     }
 
-    .gate-form .primary { margin-top: 2px; }
-
-    .gate-footnote {
-      margin: 18px 0 0;
+    .gate-foot {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.45;
     }
 
-    .topbar {
-      min-height: 190px;
-      padding:
-        max(24px, env(safe-area-inset-top))
-        max(20px, calc((100vw - 1040px) / 2))
-        28px;
-      display: flex;
-      align-items: flex-end;
-      background: var(--forest);
-      color: white;
-      position: relative;
-      overflow: hidden;
+    .gate-foot p {
+      width: 100%;
+      margin: 0 0 2px;
     }
 
-    .topbar.has-image {
-      min-height: 250px;
+    .gate-foot button,
+    .site-footer button,
+    .inline-link {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--action);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .offline-banner {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 10px 18px;
+      background: var(--danger);
+      color: white;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .hero {
+      min-height: 285px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      background: var(--forest);
+      color: white;
+    }
+
+    .hero.has-image {
+      min-height: 350px;
       background-position: center;
       background-size: cover;
     }
 
-    .topbar.has-image::before {
+    .hero::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: rgba(4, 39, 33, 0.68);
+      background:
+        linear-gradient(180deg, rgba(4, 34, 29, 0.05) 10%, rgba(4, 34, 29, 0.82) 100%);
     }
 
-    .brand {
-      width: 100%;
+    .hero-inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+      padding:
+        max(28px, env(safe-area-inset-top))
+        22px
+        34px;
       position: relative;
       z-index: 1;
       display: flex;
       align-items: flex-end;
-      gap: 16px;
+      gap: 18px;
     }
 
-    .logo {
-      width: 64px;
-      height: 64px;
-      flex: 0 0 64px;
+    .restaurant-logo {
+      width: 72px;
+      height: 72px;
+      flex: 0 0 72px;
       object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.75);
+      border: 2px solid rgba(255, 255, 255, 0.8);
       border-radius: 8px;
       background: white;
     }
 
     .eyebrow {
-      margin: 0 0 5px;
-      font-size: 13px;
-      font-weight: 700;
+      margin: 0 0 6px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 12px;
+      font-weight: 800;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.74);
     }
 
-    h1 {
+    h1, h2, h3, p { letter-spacing: 0; }
+
+    .hero h1 {
       margin: 0;
-      font-size: 46px;
-      line-height: 1.06;
-      letter-spacing: 0;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1.04;
     }
 
-    .subtitle {
-      max-width: 680px;
-      margin: 9px 0 0;
-      color: rgba(255, 255, 255, 0.82);
-      line-height: 1.45;
+    .hero-subtitle {
+      max-width: 720px;
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 17px;
+      line-height: 1.48;
+    }
+
+    .stepbar {
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, white 94%, transparent);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .stepbar ol {
+      width: min(100%, var(--content));
+      min-height: 70px;
+      margin: 0 auto;
+      padding: 0 22px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      list-style: none;
+    }
+
+    .step-indicator {
+      padding: 16px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .step-indicator[aria-current="step"] {
+      border-bottom-color: var(--action);
+      color: var(--forest-deep);
+    }
+
+    .step-number {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: white;
+      font-size: 12px;
+    }
+
+    .step-indicator[aria-current="step"] .step-number {
+      border-color: var(--action);
+      background: var(--action);
+      color: white;
     }
 
     main {
-      width: min(100%, 1040px);
+      width: min(100%, var(--content));
       margin: 0 auto;
-      padding: 24px 20px max(48px, env(safe-area-inset-bottom));
+      padding: 28px 22px 46px;
     }
 
     .status {
-      min-height: 300px;
+      min-height: 330px;
       display: grid;
       place-content: center;
       gap: 14px;
@@ -194,9 +314,11 @@
       color: var(--muted);
     }
 
+    .status h2 { color: var(--ink); }
+
     .spinner {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       margin: auto;
       border: 3px solid var(--line);
       border-top-color: var(--action);
@@ -206,120 +328,164 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .layout {
+    .booking-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+      grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.75fr);
       gap: 24px;
       align-items: start;
     }
 
-    .panel {
+    .booking-surface,
+    .summary-panel,
+    .confirmation {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--surface);
       overflow: hidden;
     }
 
-    .section {
-      padding: 22px;
-      border-bottom: 1px solid var(--line);
+    .booking-step { padding: 26px; }
+
+    .step-heading {
+      margin-bottom: 22px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
     }
 
-    .section:last-child { border-bottom: 0; }
-
-    h2, h3 {
+    .step-heading h2 {
       margin: 0;
-      letter-spacing: 0;
+      font-size: 25px;
     }
 
-    h2 { font-size: 22px; }
-    h3 { font-size: 17px; }
-
-    .section-copy {
-      margin: 5px 0 18px;
+    .step-heading p {
+      margin: 6px 0 0;
       color: var(--muted);
-      line-height: 1.45;
+      line-height: 1.5;
+    }
+
+    .section-label {
+      margin: 24px 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
     }
 
     .field-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 15px;
     }
 
     .field {
+      min-width: 0;
       display: grid;
       gap: 7px;
-      min-width: 0;
     }
 
     .field.full { grid-column: 1 / -1; }
 
     label {
       font-size: 14px;
-      font-weight: 650;
+      font-weight: 700;
+    }
+
+    .field-hint {
+      margin: -1px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
     }
 
     input, select, textarea {
       width: 100%;
-      min-height: 48px;
+      min-height: 49px;
       padding: 11px 12px;
-      border: 1px solid #b9c5c2;
+      border: 1px solid #b7c4c0;
       border-radius: 7px;
+      outline: none;
       background: white;
       color: var(--ink);
-      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 30%, transparent);
+    }
+
+    input[aria-invalid="true"],
+    textarea[aria-invalid="true"],
+    select[aria-invalid="true"] {
+      border-color: var(--danger);
     }
 
     textarea {
-      min-height: 92px;
+      min-height: 96px;
       resize: vertical;
     }
 
-    input:focus, select:focus, textarea:focus, button:focus-visible {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 35%, transparent);
-    }
-
     .guest-control {
-      min-height: 48px;
+      min-height: 49px;
       display: grid;
-      grid-template-columns: 46px 1fr 46px;
+      grid-template-columns: 50px 1fr 50px;
       align-items: center;
-      border: 1px solid #b9c5c2;
-      border-radius: 7px;
       overflow: hidden;
+      border: 1px solid #b7c4c0;
+      border-radius: 7px;
     }
 
     .guest-control button {
       height: 100%;
       border: 0;
-      background: #eef4f2;
+      background: var(--surface-muted);
       color: var(--forest);
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
     }
 
     .guest-value {
       text-align: center;
+      font-weight: 800;
+    }
+
+    .choice-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .choice {
+      min-height: 49px;
+      padding: 10px;
+      border: 1px solid #b7c4c0;
+      border-radius: 7px;
+      background: white;
+      color: var(--ink);
       font-weight: 700;
+    }
+
+    .choice[aria-pressed="true"] {
+      border-color: var(--action);
+      background: var(--action);
+      color: white;
     }
 
     .slots {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
       gap: 9px;
-      margin-top: 14px;
     }
 
     .slot {
-      min-height: 44px;
+      min-height: 46px;
       padding: 8px;
-      border: 1px solid #b9c5c2;
+      border: 1px solid #b7c4c0;
       border-radius: 7px;
       background: white;
       color: var(--ink);
-      font-weight: 650;
+      font-weight: 750;
     }
 
     .slot[aria-pressed="true"] {
@@ -328,56 +494,61 @@
       color: white;
     }
 
-    .empty-slots {
-      margin-top: 14px;
-      padding: 14px;
-      border-left: 4px solid var(--orange);
-      background: #fff5ef;
-      color: #71391d;
-    }
-
-    .summary-list {
+    .preference-grid {
       display: grid;
-      gap: 12px;
-      margin: 18px 0;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
-    .summary-row {
+    .preference {
+      min-height: 52px;
+      padding: 10px;
       display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      padding-bottom: 11px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .summary-row span:first-child { color: var(--muted); }
-    .summary-row strong { text-align: right; }
-
-    .check {
-      display: grid;
-      grid-template-columns: 22px 1fr;
+      align-items: center;
       gap: 9px;
-      align-items: start;
-      margin: 18px 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.4;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface-muted);
     }
 
-    .check input {
-      min-height: auto;
+    .preference input {
       width: 20px;
+      min-height: auto;
       height: 20px;
-      margin: 0;
+      flex: 0 0 20px;
       accent-color: var(--action);
     }
 
-    .primary, .secondary {
-      width: 100%;
+    .empty-slots,
+    .notice {
+      padding: 13px 14px;
+      border-left: 4px solid var(--orange);
+      background: var(--orange-soft);
+      color: #74401e;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .notice.error {
+      border-left-color: var(--danger);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .step-actions {
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .primary, .secondary, .quiet {
       min-height: 50px;
-      padding: 11px 16px;
+      padding: 11px 18px;
       border-radius: 7px;
-      font-weight: 750;
+      font-weight: 780;
     }
 
     .primary {
@@ -387,82 +558,359 @@
     }
 
     .primary:disabled {
-      border-color: #b9c5c2;
-      background: #dce3e1;
-      color: #6f7a77;
+      border-color: #c3cdca;
+      background: #dce4e1;
+      color: #737f7b;
       cursor: not-allowed;
     }
 
     .secondary {
-      margin-top: 10px;
-      border: 1px solid #b9c5c2;
+      border: 1px solid #b7c4c0;
       background: white;
       color: var(--forest);
     }
 
-    .notice {
-      padding: 12px 14px;
-      border-left: 4px solid var(--danger);
-      background: #fff1f0;
-      color: var(--danger);
-      font-size: 14px;
-      line-height: 1.4;
+    .quiet {
+      border: 0;
+      background: transparent;
+      color: var(--forest);
+    }
+
+    .step-actions .primary { min-width: 145px; }
+
+    .summary-panel {
+      position: sticky;
+      top: 20px;
+    }
+
+    .summary-head {
+      padding: 20px;
+      border-bottom: 1px solid var(--line);
+      background: var(--forest-deep);
+      color: white;
+    }
+
+    .summary-head p {
+      margin: 4px 0 0;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 13px;
+    }
+
+    .summary-body { padding: 20px; }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .summary-row:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .summary-row dt { color: var(--muted); }
+    .summary-row dd {
+      margin: 0;
+      text-align: right;
+      font-weight: 750;
     }
 
     .restaurant-info {
+      padding: 20px;
       display: grid;
-      gap: 12px;
+      gap: 14px;
+      border-top: 1px solid var(--line);
       color: var(--muted);
+      font-size: 14px;
       line-height: 1.5;
     }
 
     .restaurant-info strong { color: var(--ink); }
 
-    .confirmation {
-      max-width: 620px;
-      margin: 30px auto;
-      padding: 28px;
+    .review-block {
+      margin-bottom: 18px;
+      padding: 18px;
       border: 1px solid var(--line);
-      border-top: 6px solid var(--action);
-      border-radius: 8px;
-      background: white;
+      border-radius: 7px;
+      background: var(--surface-muted);
+    }
+
+    .review-block h3 {
+      margin: 0 0 12px;
+      font-size: 17px;
+    }
+
+    .review-block dl { margin: 0; }
+
+    .check {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 10px;
+      align-items: start;
+      margin: 16px 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .check input {
+      width: 20px;
+      min-height: auto;
+      height: 20px;
+      margin: 1px 0 0;
+      accent-color: var(--action);
+    }
+
+    .allergy-consent {
+      padding: 12px;
+      border: 1px solid #e5b89e;
+      border-radius: 7px;
+      background: var(--orange-soft);
+    }
+
+    .confirmation {
+      max-width: 680px;
+      margin: 30px auto;
+      padding: 34px;
       text-align: center;
     }
 
     .confirmation-mark {
-      width: 54px;
-      height: 54px;
-      margin: 0 auto 16px;
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 18px;
       display: grid;
       place-content: center;
       border-radius: 50%;
-      background: #dff5ed;
-      color: var(--forest);
+      background: var(--action-soft);
+      color: var(--success);
       font-size: 28px;
-      font-weight: 800;
+      font-weight: 850;
+    }
+
+    .confirmation h2 {
+      margin: 0;
+      font-size: 28px;
     }
 
     .confirmation-code {
-      margin: 18px 0;
-      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-      font-size: 22px;
-      font-weight: 800;
+      margin: 20px 0;
       color: var(--forest);
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 23px;
+      font-weight: 850;
     }
 
-    .hidden { display: none !important; }
+    .confirmation-actions {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
 
-    @media (max-width: 760px) {
-      .topbar { min-height: 170px; }
-      h1 { font-size: 34px; }
-      .brand { align-items: center; }
-      .logo { width: 52px; height: 52px; flex-basis: 52px; }
-      main { padding: 16px 12px 40px; }
-      .layout { grid-template-columns: 1fr; }
+    .site-footer {
+      padding:
+        28px
+        22px
+        max(28px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: white;
+    }
+
+    .footer-inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .footer-brand strong {
+      display: block;
+      color: var(--forest-deep);
+      font-size: 15px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px 18px;
+      font-size: 13px;
+    }
+
+    .legal-dialog {
+      width: min(calc(100% - 28px), 780px);
+      max-height: min(86dvh, 900px);
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      box-shadow: 0 28px 90px rgba(15, 28, 24, 0.28);
+    }
+
+    .legal-dialog::backdrop {
+      background: rgba(7, 18, 15, 0.62);
+      backdrop-filter: blur(4px);
+    }
+
+    .legal-header {
+      min-height: 64px;
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .legal-header strong { font-size: 18px; }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--surface-muted);
+      color: var(--ink);
+      font-size: 22px;
+    }
+
+    .legal-content {
+      padding: 24px;
+      overflow-wrap: anywhere;
+    }
+
+    .legal-content h1 {
+      margin: 0 0 8px;
+      font-size: 31px;
+    }
+
+    .legal-content h2 {
+      margin: 28px 0 8px;
+      font-size: 20px;
+    }
+
+    .legal-content h3 {
+      margin: 18px 0 6px;
+      font-size: 16px;
+    }
+
+    .legal-content p,
+    .legal-content li {
+      color: #46524e;
+      line-height: 1.65;
+    }
+
+    .legal-content ul { padding-left: 22px; }
+
+    .legal-meta {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .draft-warning {
+      padding: 13px 14px;
+      border-left: 4px solid var(--orange);
+      background: var(--orange-soft);
+      color: #74401e;
+      line-height: 1.5;
+    }
+
+    .placeholder {
+      padding: 0 3px;
+      background: #fff0a8;
+      color: #493b00;
+      font-weight: 750;
+    }
+
+    @media (max-width: 820px) {
+      .hero { min-height: 235px; }
+      .hero.has-image { min-height: 285px; }
+      .booking-layout { grid-template-columns: 1fr; }
+      .summary-panel {
+        position: static;
+        order: -1;
+      }
+      .restaurant-info { display: none; }
+    }
+
+    @media (max-width: 620px) {
+      .gate-content { padding: 24px 20px; }
+      .gate-panel h1 { font-size: 28px; }
+      .hero-inner {
+        padding-left: 18px;
+        padding-right: 18px;
+        padding-bottom: 24px;
+        align-items: center;
+      }
+      .restaurant-logo {
+        width: 58px;
+        height: 58px;
+        flex-basis: 58px;
+      }
+      .hero h1 { font-size: 34px; }
+      .hero-subtitle { font-size: 15px; }
+      .stepbar ol { padding: 0 8px; }
+      .step-indicator {
+        min-width: 0;
+        gap: 6px;
+        font-size: 12px;
+      }
+      .step-number { display: none; }
+      main { padding: 16px 10px 32px; }
+      .booking-step { padding: 20px 15px; }
+      .step-heading h2 { font-size: 23px; }
       .field-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
-      .section { padding: 18px 15px; }
-      .side-panel { order: -1; }
+      .preference-grid { grid-template-columns: 1fr; }
+      .summary-head,
+      .summary-body { padding: 16px; }
+      .summary-body { display: none; }
+      .summary-panel.expanded .summary-body { display: block; }
+      .summary-head {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .summary-head::after {
+        content: "⌄";
+        font-size: 22px;
+      }
+      .summary-panel.expanded .summary-head::after { content: "⌃"; }
+      .step-actions { align-items: stretch; }
+      .step-actions .primary { min-width: 0; flex: 1; }
+      .confirmation { padding: 28px 18px; }
+      .confirmation-actions { flex-direction: column; }
+      .footer-inner { flex-direction: column; }
+      .footer-links { justify-content: flex-start; }
+      .legal-content { padding: 20px 17px 30px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -475,157 +923,752 @@
   </style>
 </head>
 <body class="gate-locked">
+  <div class="offline-banner hidden" id="offline-banner" role="status">
+    Offline – neue Reservierungen können erst wieder online gesendet werden.
+  </div>
+
   <section class="development-gate" id="development-gate" aria-labelledby="gate-title">
     <div class="gate-panel">
-      <div class="gate-mark" aria-hidden="true">S</div>
-      <p class="gate-badge">Nicht öffentlich</p>
-      <h1 id="gate-title">Entwicklungsvorschau</h1>
-      <p class="gate-copy">
-        Diese Website befindet sich in Entwicklung und ist noch nicht für die Öffentlichkeit
-        freigegeben. Der Zugang ist ausschließlich für autorisierte Tests vorgesehen.
-      </p>
-      <form class="gate-form" id="gate-form">
-        <label for="development-pin">Zugangs-PIN</label>
-        <input
-          id="development-pin"
-          type="password"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          maxlength="8"
-          autocomplete="off"
-          required
-          aria-describedby="gate-error"
-        >
-        <div class="notice hidden" id="gate-error" role="alert">
-          Der eingegebene PIN ist nicht korrekt.
+      <div class="gate-accent"></div>
+      <div class="gate-content">
+        <div class="servora-wordmark">
+          <span class="servora-mark" aria-hidden="true">S</span>
+          <span>Servora</span>
         </div>
-        <button class="primary" type="submit" id="gate-submit">Vorschau öffnen</button>
-      </form>
-      <p class="gate-footnote">
-        Bitte gib den Link und den PIN nicht öffentlich weiter.
-      </p>
+        <p class="gate-badge">Nicht öffentlich</p>
+        <h1 id="gate-title">Entwicklungsvorschau</h1>
+        <p class="gate-copy">
+          Diese Website ist noch nicht veröffentlicht. Der Zugang ist ausschließlich für
+          autorisierte Funktions- und Darstellungstests vorgesehen.
+        </p>
+        <form class="gate-form" id="gate-form">
+          <label for="development-pin">Zugangs-PIN</label>
+          <input
+            id="development-pin"
+            type="password"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="8"
+            autocomplete="off"
+            required
+            aria-describedby="gate-error"
+          >
+          <div class="notice error hidden" id="gate-error" role="alert">
+            Der eingegebene PIN ist nicht korrekt.
+          </div>
+          <button class="primary" type="submit" id="gate-submit">Vorschau öffnen</button>
+        </form>
+        <div class="gate-foot">
+          <p>Bitte Link und PIN nicht öffentlich weitergeben.</p>
+          <p>Support, Veröffentlichungshilfe und rechtliche Entwürfe werden erst nach der Freigabe angezeigt.</p>
+        </div>
+      </div>
     </div>
   </section>
 
   <div id="site-content" inert aria-hidden="true">
-    <header class="topbar" id="topbar">
-      <div class="brand">
-        <img class="logo hidden" id="logo" alt="">
+    <header class="hero" id="hero">
+      <div class="hero-inner">
+        <img class="restaurant-logo hidden" id="logo" alt="">
         <div>
           <p class="eyebrow">Online-Reservierung</p>
           <h1 id="restaurant-name">Servora</h1>
-          <p class="subtitle" id="restaurant-description">Reservierungsdaten werden geladen.</p>
+          <p class="hero-subtitle" id="restaurant-description">
+            Freie Zeiten werden für dich geladen.
+          </p>
         </div>
       </div>
     </header>
 
+    <nav class="stepbar hidden" id="stepbar" aria-label="Reservierungsschritte">
+      <ol>
+        <li class="step-indicator" data-step-indicator="1" aria-current="step">
+          <span class="step-number">1</span><span>Termin</span>
+        </li>
+        <li class="step-indicator" data-step-indicator="2">
+          <span class="step-number">2</span><span>Gastdaten</span>
+        </li>
+        <li class="step-indicator" data-step-indicator="3">
+          <span class="step-number">3</span><span>Prüfen</span>
+        </li>
+      </ol>
+    </nav>
+
     <main>
-    <div class="status" id="loading" role="status">
-      <div class="spinner" aria-hidden="true"></div>
-      <span>Freie Zeiten werden geladen</span>
-    </div>
-
-    <div class="status hidden" id="fatal">
-      <h2>Reservierung nicht verfügbar</h2>
-      <p id="fatal-message">Der Link ist unvollständig oder nicht mehr gültig.</p>
-    </div>
-
-    <form class="layout hidden" id="booking-form">
-      <div class="panel">
-        <section class="section">
-          <h2>Tisch finden</h2>
-          <p class="section-copy">Wähle Personenanzahl, Datum und Wunschbereich.</p>
-          <div class="field-grid">
-            <div class="field">
-              <label for="guests">Personen</label>
-              <div class="guest-control">
-                <button type="button" id="guests-minus" aria-label="Eine Person weniger">−</button>
-                <div class="guest-value" id="guests-value" aria-live="polite">2 Personen</div>
-                <button type="button" id="guests-plus" aria-label="Eine Person mehr">+</button>
-              </div>
-              <input type="hidden" id="guests" value="2">
-            </div>
-            <div class="field">
-              <label for="date">Datum</label>
-              <input type="date" id="date" required>
-            </div>
-            <div class="field full">
-              <label for="area">Bereich</label>
-              <select id="area" required></select>
-            </div>
-          </div>
-          <div class="slots" id="slots" aria-label="Verfügbare Uhrzeiten"></div>
-          <div class="empty-slots hidden" id="empty-slots">
-            Für diese Auswahl ist aktuell kein Tisch verfügbar.
-          </div>
-        </section>
-
-        <section class="section">
-          <h2>Deine Angaben</h2>
-          <p class="section-copy">Das Restaurant verwendet diese Daten nur für die Reservierung.</p>
-          <div class="field-grid" id="contact-fields">
-            <div class="field" data-public-field="Vorname">
-              <label for="first-name">Vorname</label>
-              <input id="first-name" autocomplete="given-name">
-            </div>
-            <div class="field" data-public-field="Nachname">
-              <label for="last-name">Nachname</label>
-              <input id="last-name" autocomplete="family-name">
-            </div>
-            <div class="field" data-public-field="E-Mail-Adresse">
-              <label for="email">E-Mail-Adresse</label>
-              <input type="email" id="email" autocomplete="email">
-            </div>
-            <div class="field" data-public-field="Telefonnummer">
-              <label for="phone">Telefonnummer</label>
-              <input type="tel" id="phone" autocomplete="tel">
-            </div>
-            <div class="field full" data-public-field="Anlass">
-              <label for="occasion">Anlass</label>
-              <input id="occasion" autocomplete="off">
-            </div>
-            <div class="field full" data-public-field="Hinweise">
-              <label for="notes">Hinweise</label>
-              <textarea id="notes"></textarea>
-            </div>
-            <div class="field full" data-public-field="Freiwillige Allergiehinweise">
-              <label for="allergies">Freiwillige Allergiehinweise</label>
-              <textarea id="allergies"></textarea>
-            </div>
-          </div>
-        </section>
+      <div class="status" id="loading" role="status">
+        <div class="spinner" aria-hidden="true"></div>
+        <span>Freie Zeiten werden geladen</span>
       </div>
 
-      <aside class="panel side-panel">
-        <section class="section">
-          <h3>Deine Reservierung</h3>
-          <div class="summary-list">
-            <div class="summary-row"><span>Personen</span><strong id="summary-guests">2</strong></div>
-            <div class="summary-row"><span>Datum</span><strong id="summary-date">–</strong></div>
-            <div class="summary-row"><span>Uhrzeit</span><strong id="summary-time">–</strong></div>
-            <div class="summary-row"><span>Bereich</span><strong id="summary-area">–</strong></div>
-          </div>
-          <label class="check">
-            <input type="checkbox" id="privacy" required>
-            <span>Ich stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Reservierung zu.</span>
-          </label>
-          <div class="notice hidden" id="form-error" role="alert"></div>
-          <button class="primary" type="submit" id="submit" disabled>Reservierung anfragen</button>
-          <button class="secondary" type="button" id="open-app">In Servora öffnen</button>
-        </section>
-        <section class="section restaurant-info" id="restaurant-info"></section>
-      </aside>
-    </form>
+      <div class="status hidden" id="fatal">
+        <h2>Reservierung nicht verfügbar</h2>
+        <p id="fatal-message">Der Link ist unvollständig oder nicht mehr gültig.</p>
+      </div>
 
-    <section class="confirmation hidden" id="confirmation" aria-live="polite">
-      <div class="confirmation-mark" aria-hidden="true">✓</div>
-      <h2 id="confirmation-title">Reservierung eingegangen</h2>
-      <div class="confirmation-code" id="confirmation-code"></div>
-      <p id="confirmation-message"></p>
-      <button class="secondary" type="button" id="new-booking">Weitere Reservierung</button>
-    </section>
+      <form class="booking-layout hidden" id="booking-form" novalidate>
+        <div class="booking-surface">
+          <section class="booking-step" data-booking-step="1">
+            <div class="step-heading">
+              <div>
+                <h2>Wann dürfen wir dich begrüßen?</h2>
+                <p>Wähle Gästezahl, Datum, Bereich und eine freie Uhrzeit.</p>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="guests">Personen</label>
+                <div class="guest-control">
+                  <button type="button" id="guests-minus" aria-label="Eine Person weniger">−</button>
+                  <output class="guest-value" id="guests-value" for="guests">2 Personen</output>
+                  <button type="button" id="guests-plus" aria-label="Eine Person mehr">+</button>
+                </div>
+                <input type="hidden" id="guests" value="2">
+              </div>
+              <div class="field">
+                <label for="date">Datum</label>
+                <input type="date" id="date" required>
+              </div>
+              <div class="field full" id="area-field">
+                <label for="area">Wunschbereich</label>
+                <select id="area" required></select>
+              </div>
+            </div>
+
+            <p class="section-label">Verfügbare Uhrzeiten</p>
+            <div class="slots" id="slots" aria-label="Verfügbare Uhrzeiten"></div>
+            <div class="empty-slots hidden" id="empty-slots">
+              Für diese Auswahl ist aktuell kein passender Tisch frei. Probiere ein anderes
+              Datum, eine andere Gästezahl oder einen anderen Bereich.
+            </div>
+
+            <div class="step-actions">
+              <span></span>
+              <button class="primary" type="button" data-next-step="2">Weiter</button>
+            </div>
+          </section>
+
+          <section class="booking-step hidden" data-booking-step="2">
+            <div class="step-heading">
+              <div>
+                <h2>Wie können wir dich erreichen?</h2>
+                <p>Das Restaurant nutzt diese Angaben ausschließlich für deine Reservierung.</p>
+              </div>
+            </div>
+
+            <div class="field-grid" id="contact-fields">
+              <div class="field" data-public-field="Vorname">
+                <label for="first-name">Vorname</label>
+                <input id="first-name" autocomplete="given-name">
+              </div>
+              <div class="field" data-public-field="Nachname">
+                <label for="last-name">Nachname</label>
+                <input id="last-name" autocomplete="family-name">
+              </div>
+              <div class="field" data-public-field="E-Mail-Adresse">
+                <label for="email">E-Mail-Adresse</label>
+                <input type="email" id="email" autocomplete="email">
+              </div>
+              <div class="field" data-public-field="Telefonnummer">
+                <label for="phone">Telefonnummer</label>
+                <input type="tel" id="phone" autocomplete="tel">
+              </div>
+              <div class="field full" data-public-field="Anlass">
+                <label for="occasion">Anlass</label>
+                <input id="occasion" autocomplete="off">
+              </div>
+            </div>
+
+            <div id="preference-fields">
+              <p class="section-label">Wünsche</p>
+              <div class="preference-grid">
+                <label class="preference" data-public-field="Kinderstuhl">
+                  <input type="checkbox" id="high-chair">
+                  <span>Kinderstuhl</span>
+                </label>
+                <label class="preference" data-public-field="Rollstuhlplatz">
+                  <input type="checkbox" id="wheelchair">
+                  <span>Rollstuhlplatz</span>
+                </label>
+                <label class="preference" data-public-field="Haustier">
+                  <input type="checkbox" id="pet">
+                  <span>Haustier</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field-grid" style="margin-top: 15px">
+              <div class="field full" data-public-field="Hinweise">
+                <label for="notes">Weitere Hinweise</label>
+                <textarea id="notes" maxlength="1000"></textarea>
+              </div>
+              <div class="field full" data-public-field="Freiwillige Allergiehinweise">
+                <label for="allergies">Freiwillige Allergiehinweise</label>
+                <textarea id="allergies" maxlength="1000"></textarea>
+                <p class="field-hint">
+                  Nur angeben, wenn das Restaurant diese Information für die Reservierung
+                  berücksichtigen soll. Eine allergenfreie Zubereitung kann dadurch nicht garantiert werden.
+                </p>
+              </div>
+            </div>
+
+            <div class="notice error hidden" id="contact-error" role="alert"></div>
+            <div class="step-actions">
+              <button class="quiet" type="button" data-previous-step="1">Zurück</button>
+              <button class="primary" type="button" data-next-step="3">Weiter</button>
+            </div>
+          </section>
+
+          <section class="booking-step hidden" data-booking-step="3">
+            <div class="step-heading">
+              <div>
+                <h2>Reservierung prüfen</h2>
+                <p>Kontrolliere deine Angaben, bevor du die Anfrage absendest.</p>
+              </div>
+            </div>
+
+            <div class="review-block">
+              <h3>Termin</h3>
+              <dl class="summary-list" id="review-appointment"></dl>
+            </div>
+            <div class="review-block">
+              <h3>Kontakt</h3>
+              <dl class="summary-list" id="review-contact"></dl>
+            </div>
+
+            <label class="check">
+              <input type="checkbox" id="privacy" required>
+              <span>
+                Ich habe die
+                <button class="inline-link" type="button" data-legal="reservierungsdatenschutz">
+                  Datenschutzhinweise zur Reservierung
+                </button>
+                gelesen.
+              </span>
+            </label>
+
+            <label class="check allergy-consent hidden" id="allergy-consent-wrap">
+              <input type="checkbox" id="allergy-consent">
+              <span>
+                Ich willige ausdrücklich ein, dass meine freiwilligen Allergie- oder
+                Gesundheitsangaben für diese Reservierung verarbeitet werden. Die Einwilligung
+                kann ich mit Wirkung für die Zukunft beim Restaurant widerrufen.
+              </span>
+            </label>
+
+            <div class="notice error hidden" id="form-error" role="alert"></div>
+            <div class="step-actions">
+              <button class="quiet" type="button" data-previous-step="2">Zurück</button>
+              <button class="primary" type="submit" id="submit">Reservierung anfragen</button>
+            </div>
+          </section>
+        </div>
+
+        <aside class="summary-panel" id="summary-panel">
+          <div class="summary-head" id="summary-toggle">
+            <div>
+              <strong>Deine Reservierung</strong>
+              <p id="summary-compact">Noch keine Uhrzeit gewählt</p>
+            </div>
+          </div>
+          <div class="summary-body">
+            <dl class="summary-list">
+              <div class="summary-row"><dt>Personen</dt><dd id="summary-guests">2</dd></div>
+              <div class="summary-row"><dt>Datum</dt><dd id="summary-date">–</dd></div>
+              <div class="summary-row"><dt>Uhrzeit</dt><dd id="summary-time">–</dd></div>
+              <div class="summary-row"><dt>Bereich</dt><dd id="summary-area">–</dd></div>
+            </dl>
+          </div>
+          <div class="restaurant-info" id="restaurant-info"></div>
+        </aside>
+      </form>
+
+      <section class="confirmation hidden" id="confirmation" aria-live="polite">
+        <div class="confirmation-mark" aria-hidden="true">✓</div>
+        <h2 id="confirmation-title">Reservierung eingegangen</h2>
+        <div class="confirmation-code" id="confirmation-code"></div>
+        <p id="confirmation-message"></p>
+        <p class="field-hint">Bewahre die Reservierungsnummer für Rückfragen auf.</p>
+        <div class="confirmation-actions">
+          <button class="secondary" type="button" id="copy-confirmation">Nummer kopieren</button>
+          <button class="primary" type="button" id="new-booking">Weitere Reservierung</button>
+        </div>
+      </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <strong>Reservierung mit Servora</strong>
+          Sichere Restaurantorganisation und Online-Reservierungen.
+        </div>
+        <div class="footer-links">
+          <button type="button" data-legal="support">Support</button>
+          <button type="button" data-legal="veroeffentlichung">Veröffentlichung</button>
+          <button type="button" data-legal="impressum">Impressum</button>
+          <button type="button" data-legal="datenschutz">Datenschutz</button>
+          <button type="button" data-legal="nutzungsbedingungen">Nutzungsbedingungen</button>
+          <button type="button" data-legal="agb">AGB</button>
+        </div>
+      </div>
+    </footer>
   </div>
+
+  <dialog class="legal-dialog" id="legal-dialog" aria-labelledby="legal-dialog-title">
+    <div class="legal-header">
+      <strong id="legal-dialog-title">Rechtliche Informationen</strong>
+      <button class="icon-button" type="button" id="close-legal" aria-label="Schließen">×</button>
+    </div>
+    <div class="legal-content">
+      <article data-legal-document="impressum">
+        <h1>Impressum</h1>
+        <p class="legal-meta">Anbieterkennzeichnung nach § 5 DDG · Entwurfsstand 26. Juli 2026</p>
+        <div class="draft-warning">
+          Entwurf für die Veröffentlichung. Alle gelb markierten Angaben müssen vor der
+          öffentlichen Freigabe durch die tatsächlichen Anbieterdaten ersetzt und rechtlich geprüft werden.
+        </div>
+        <h2>Anbieter von Servora</h2>
+        <p>
+          <span class="placeholder">[VOLLSTÄNDIGER NAME / FIRMA]</span><br>
+          <span class="placeholder">[RECHTSFORM, FALLS VORHANDEN]</span><br>
+          <span class="placeholder">[STRASSE UND HAUSNUMMER]</span><br>
+          <span class="placeholder">[PLZ UND ORT]</span><br>
+          Deutschland
+        </p>
+        <h2>Kontakt</h2>
+        <p>
+          E-Mail: <span class="placeholder">[KONTAKT-E-MAIL]</span><br>
+          Telefon: <span class="placeholder">[TELEFONNUMMER]</span>
+        </p>
+        <h2>Vertretung und Register</h2>
+        <p>
+          Vertretungsberechtigt:
+          <span class="placeholder">[VERTRETUNGSBERECHTIGTE PERSON, FALLS ERFORDERLICH]</span><br>
+          Registergericht und Registernummer:
+          <span class="placeholder">[REGISTERANGABEN ODER „NICHT EINGETRAGEN“]</span><br>
+          Umsatzsteuer-Identifikationsnummer:
+          <span class="placeholder">[UST-ID ODER „NICHT VORHANDEN“]</span>
+        </p>
+        <h2>Verbraucherstreitbeilegung</h2>
+        <p>
+          <span class="placeholder">[ANGABE NACH § 36 VSBG: TEILNAHMEBEREITSCHAFT,
+          VERPFLICHTUNG ODER ZUTREFFENDE AUSNAHME]</span>
+        </p>
+        <h2>Inhaltlich verantwortlich</h2>
+        <p><span class="placeholder">[NAME UND ANSCHRIFT, FALLS ERFORDERLICH]</span></p>
+      </article>
+
+      <article data-legal-document="datenschutz" hidden>
+        <h1>Datenschutzerklärung</h1>
+        <p class="legal-meta">Für Servora App und Website · Entwurfsstand 26. Juli 2026</p>
+        <div class="draft-warning">
+          Dieser Text bildet den aktuellen technischen Stand ab, ist aber keine Rechtsberatung.
+          Anbieter, Projektregion, Aufbewahrungsfristen und Kontaktwege müssen vor Veröffentlichung ergänzt werden.
+        </div>
+        <h2>1. Verantwortlicher</h2>
+        <p>
+          <span class="placeholder">[VOLLSTÄNDIGER NAME / FIRMA]</span>,
+          <span class="placeholder">[ANSCHRIFT]</span>,
+          E-Mail <span class="placeholder">[DATENSCHUTZ-E-MAIL]</span>.
+        </p>
+        <h2>2. Verhältnis zu Restaurants</h2>
+        <p>
+          Servora ist eine Organisationsplattform für Restaurants. Für Mitarbeiter-, Betriebs-
+          und Reservierungsdaten ist grundsätzlich das Restaurant verantwortlich, das Servora
+          einsetzt und über Zwecke sowie Mittel der Verarbeitung entscheidet. Soweit Servora
+          Daten ausschließlich im Auftrag eines Restaurants verarbeitet, erfolgt dies als
+          Auftragsverarbeiter auf Grundlage einer Vereinbarung nach Art. 28 DSGVO.
+        </p>
+        <h2>3. Verarbeitete Daten</h2>
+        <ul>
+          <li>Kontodaten: Name, Benutzername, Telefonnummer, Restaurantkennung, Rolle und technische Benutzer-ID.</li>
+          <li>Restaurantdaten: Name, Anschrift, Kontaktdaten, Bereiche, Tische, Produkte, Preise, Stationen und Einstellungen.</li>
+          <li>Betriebsdaten: Bestellungen, Küchenbons, Reservierungen, Schichten, Abwesenheiten und Statusänderungen.</li>
+          <li>Gastdaten: Name, E-Mail-Adresse, Telefonnummer, Anschrift, Reservierungszeit, Personenanzahl und Hinweise.</li>
+          <li>Freiwillige sensible Angaben: insbesondere Allergie-, Barrierefreiheits- oder krankheitsbezogene Angaben.</li>
+          <li>Medien: freiwillig ausgewählte Restaurantlogos, Titelbilder und QR-Codes.</li>
+          <li>Technische Daten: IP-Adresse, Zeitstempel, Geräte- und Verbindungsinformationen sowie notwendige Sicherheitsprotokolle.</li>
+        </ul>
+        <h2>4. Zwecke und Rechtsgrundlagen</h2>
+        <p>
+          Die Verarbeitung dient der Kontoverwaltung, Bereitstellung der App, Restaurantorganisation,
+          Reservierungsbearbeitung, Synchronisation, Sicherheit, Fehlerbehebung und Erfüllung gesetzlicher
+          Pflichten. Je nach Beziehung beruht sie insbesondere auf Art. 6 Abs. 1 Buchst. b, c oder f DSGVO.
+          Freiwillige besondere Kategorien personenbezogener Daten werden nur auf Grundlage einer
+          ausdrücklichen Einwilligung nach Art. 9 Abs. 2 Buchst. a DSGVO verarbeitet.
+        </p>
+        <h2>5. Empfänger und Dienstleister</h2>
+        <p>
+          Für Backend, Authentifizierung und Datenbank wird Supabase eingesetzt. Die öffentliche
+          Reservierungsseite wird derzeit über GitHub Pages ausgeliefert. Apple verarbeitet Daten
+          im Rahmen von App Store, Installation und optionalen Systemdiensten eigenverantwortlich.
+          Projektregion und konkrete Vertragsdaten:
+          <span class="placeholder">[SUPABASE-REGION UND VERTRAGSDATEN ERGÄNZEN]</span>.
+        </p>
+        <h2>6. Drittlandübermittlungen</h2>
+        <p>
+          Eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums erfolgt nur, soweit hierfür
+          eine zulässige Grundlage und angemessene Garantien bestehen. Die tatsächlich eingesetzten
+          Regionen, Unterauftragnehmer und Garantien werden vor Veröffentlichung abschließend dokumentiert.
+        </p>
+        <h2>7. Speicherdauer und Löschung</h2>
+        <p>
+          Daten werden nur so lange gespeichert, wie sie für den jeweiligen Zweck, gesetzliche
+          Aufbewahrungspflichten oder die Bearbeitung von Ansprüchen erforderlich sind.
+          Vorgesehene Fristen: Reservierungsdaten
+          <span class="placeholder">[FRIST]</span>, Kontodaten bis zur Kontolöschung,
+          Sicherheitsprotokolle <span class="placeholder">[FRIST]</span>.
+          Löschanfragen können innerhalb der App oder über
+          <span class="placeholder">[DATENSCHUTZ-E-MAIL]</span> gestellt werden.
+        </p>
+        <h2>8. Rechte betroffener Personen</h2>
+        <p>
+          Betroffene Personen können nach Maßgabe der DSGVO Auskunft, Berichtigung, Löschung,
+          Einschränkung, Datenübertragbarkeit und Widerspruch verlangen sowie erteilte
+          Einwilligungen mit Wirkung für die Zukunft widerrufen. Außerdem besteht ein
+          Beschwerderecht bei einer Datenschutzaufsichtsbehörde.
+        </p>
+        <h2>9. Website-Speicher und Cookies</h2>
+        <p>
+          Die Reservierungsseite setzt derzeit keine Werbe- oder Analyse-Cookies ein.
+          Während der nicht öffentlichen Entwicklungsvorschau wird ausschließlich ein
+          technisch notwendiger Sitzungswert im Session Storage gespeichert, damit die PIN
+          nicht bei jedem Seitenwechsel erneut eingegeben werden muss. Dieser Wert wird beim
+          Schließen der Browsersitzung entfernt.
+        </p>
+        <h2>10. Sicherheit und Änderungen</h2>
+        <p>
+          Servora verwendet rollenbasierte Zugriffe, verschlüsselte Übertragung und
+          serverseitige Zugriffskontrollen. Kein Verfahren kann absolute Sicherheit garantieren.
+          Diese Erklärung wird angepasst, wenn sich Funktionen, Dienstleister oder Rechtslage ändern.
+        </p>
+      </article>
+
+      <article data-legal-document="reservierungsdatenschutz" hidden>
+        <h1>Datenschutzhinweise zur Reservierung</h1>
+        <p class="legal-meta">Informationen für Restaurantgäste · Entwurfsstand 26. Juli 2026</p>
+        <h2>Verantwortliches Restaurant</h2>
+        <p id="booking-controller">
+          Das im Reservierungskopf genannte Restaurant ist für die Bearbeitung deiner
+          Reservierung verantwortlich. Die veröffentlichten Kontaktdaten findest du auf der Reservierungsseite.
+        </p>
+        <h2>Zweck und Rechtsgrundlage</h2>
+        <p>
+          Deine Angaben werden verwendet, um die Reservierung anzunehmen, zu bestätigen,
+          Rückfragen zu klären, einen Tisch einzuplanen und die Reservierung durchzuführen.
+          Erforderliche Reservierungsdaten werden zur Durchführung vorvertraglicher Maßnahmen
+          und des Reservierungsverhältnisses verarbeitet.
+        </p>
+        <h2>Freiwillige Allergie- und Gesundheitsangaben</h2>
+        <p>
+          Solche Angaben sind freiwillig und können besondere Kategorien personenbezogener
+          Daten darstellen. Sie werden nur verarbeitet, wenn du ausdrücklich einwilligst.
+          Die Einwilligung kann beim Restaurant mit Wirkung für die Zukunft widerrufen werden.
+          Die Angabe ersetzt keine persönliche Rücksprache und begründet keine Garantie für
+          eine allergenfreie Zubereitung.
+        </p>
+        <h2>Empfänger und Speicherdauer</h2>
+        <p>
+          Zugriff erhalten nur berechtigte Beschäftigte des Restaurants und die für den Betrieb
+          eingesetzten technischen Dienstleister. Servora verarbeitet die Daten als Plattformdienst.
+          Das Restaurant legt die konkrete Aufbewahrungsdauer fest und löscht Daten, sobald sie
+          nicht mehr benötigt werden oder gesetzliche Pflichten nicht entgegenstehen.
+        </p>
+        <h2>Deine Rechte</h2>
+        <p>
+          Für Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch oder Widerruf wende
+          dich direkt an das Restaurant. Ergänzend erreichst du den Servora-Datenschutzkontakt
+          unter <span class="placeholder">[DATENSCHUTZ-E-MAIL]</span>.
+        </p>
+      </article>
+
+      <article data-legal-document="nutzungsbedingungen" hidden>
+        <h1>Nutzungsbedingungen</h1>
+        <p class="legal-meta">Servora App und Online-Reservierung · Entwurfsstand 26. Juli 2026</p>
+        <div class="draft-warning">
+          Vor Veröffentlichung Anbieter, Supportkontakt, Leistungsumfang und Kündigungsprozess final abstimmen.
+        </div>
+        <h2>1. Geltungsbereich</h2>
+        <p>
+          Diese Bedingungen regeln die Nutzung von Servora durch Restaurantleitungen,
+          Beschäftigte, Gerätezugänge und Gäste der Online-Reservierung. Für entgeltliche
+          Verträge mit Restaurants gelten ergänzend die AGB.
+        </p>
+        <h2>2. Konten und Zugänge</h2>
+        <p>
+          Zugangsdaten sind geheim zu halten und dürfen nur berechtigten Personen oder
+          ausdrücklich eingerichteten Stationsgeräten überlassen werden. Restaurantleitungen
+          verwalten Rollen und tragen die Verantwortung für die Aktualität ihrer Teamzugänge.
+        </p>
+        <h2>3. Zulässige Nutzung</h2>
+        <p>
+          Servora darf ausschließlich zur rechtmäßigen Restaurantorganisation genutzt werden.
+          Unzulässig sind insbesondere das Umgehen von Berechtigungen, automatisierte Angriffe,
+          das Einstellen rechtswidriger Inhalte, die Verarbeitung von Daten ohne Rechtsgrundlage
+          und die Störung des Dienstes.
+        </p>
+        <h2>4. Verantwortung des Restaurants</h2>
+        <p>
+          Das Restaurant ist für Produkt-, Preis-, Steuer-, Allergen-, Mitarbeiter- und
+          Reservierungsangaben sowie erforderliche Informationen gegenüber Gästen und
+          Beschäftigten verantwortlich. Servora ersetzt keine Steuer-, Rechts-, Hygiene-,
+          Arbeitsschutz- oder Allergenberatung.
+        </p>
+        <h2>5. Online-Reservierungen</h2>
+        <p>
+          Eine Reservierungsanfrage ist erst verbindlich bestätigt, wenn die Seite dies
+          ausdrücklich anzeigt oder das Restaurant die Bestätigung erteilt. Das Restaurant
+          entscheidet über Verfügbarkeit, Stornierung, Verspätung und Bewirtung. Servora ist
+          technischer Vermittler und nicht Vertragspartner der Bewirtungsleistung.
+        </p>
+        <h2>6. Verfügbarkeit und Änderungen</h2>
+        <p>
+          Wartung, Sicherheitsmaßnahmen, Internet- oder Drittanbieterstörungen können die
+          Verfügbarkeit vorübergehend einschränken. Sicherheitsrelevante und notwendige
+          Aktualisierungen dürfen bereitgestellt werden, ohne Arbeitsdaten bewusst zu verfälschen.
+        </p>
+        <h2>7. Meldung von Fehlern</h2>
+        <p>
+          Sicherheits- oder Funktionsprobleme sind über
+          <span class="placeholder">[SUPPORT-E-MAIL]</span> zu melden. Kritische betriebliche
+          Vorgänge müssen bis zur Klärung mit geeigneten Ersatzabläufen abgesichert werden.
+        </p>
+        <h2>8. Beendigung und Kontolöschung</h2>
+        <p>
+          Nutzer können die Löschung ihres Kontos in den Kontoeinstellungen anstoßen.
+          Restaurantleitungen müssen zuvor verbleibende Leitungsrechte und gesetzliche
+          Aufbewahrungspflichten klären. Einzelheiten ergeben sich aus den AGB und der Datenschutzerklärung.
+        </p>
+        <h2>9. Schlussbestimmungen</h2>
+        <p>
+          Es gilt <span class="placeholder">[ANWENDBARES RECHT]</span>.
+          Unabdingbare gesetzliche Rechte bleiben unberührt. Änderungen werden in geeigneter
+          Form mitgeteilt, soweit eine Mitteilung erforderlich ist.
+        </p>
+      </article>
+
+      <article data-legal-document="agb" hidden>
+        <h1>Allgemeine Geschäftsbedingungen</h1>
+        <p class="legal-meta">Für Verträge über Servora · Entwurfsstand 26. Juli 2026</p>
+        <div class="draft-warning">
+          Dieser B2B-Entwurf setzt voraus, dass Servora nur gegenüber Unternehmern angeboten wird.
+          Preis, Laufzeit, Leistungsbeschreibung und Haftung müssen vor Verwendung individuell geprüft werden.
+        </div>
+        <h2>1. Anbieter und Vertragspartner</h2>
+        <p>
+          Anbieter ist <span class="placeholder">[VOLLSTÄNDIGER NAME / FIRMA UND ANSCHRIFT]</span>.
+          Vertragspartner können ausschließlich Unternehmer im Sinne des § 14 BGB sein,
+          sofern nicht ausdrücklich etwas anderes vereinbart wird.
+        </p>
+        <h2>2. Vertragsgegenstand</h2>
+        <p>
+          Servora stellt cloudgestützte Funktionen für Restaurantorganisation, Tischverwaltung,
+          Bestellungen, Küchenstationen, Reservierungen, Schichten und zugehörige Geräte bereit.
+          Der konkrete Funktionsumfang ergibt sich aus dem gewählten Tarif und der zum
+          Vertragsschluss bereitgestellten Leistungsbeschreibung.
+        </p>
+        <h2>3. Vertragsschluss und Testphase</h2>
+        <p>
+          Ein Vertrag kommt durch Annahme eines Angebots, Abschluss eines Bestellprozesses oder
+          ausdrückliche Freischaltung zustande. Eine Testphase ist nur verbindlich, wenn Dauer,
+          Funktionsumfang und Übergang in einen kostenpflichtigen Tarif klar ausgewiesen sind.
+        </p>
+        <h2>4. Preise und Zahlung</h2>
+        <p>
+          Es gelten die bei Vertragsschluss ausgewiesenen Nettopreise zuzüglich gesetzlicher
+          Umsatzsteuer. Abrechnung, Fälligkeit und Zahlungsweg:
+          <span class="placeholder">[PREISMODELL, ABRECHNUNGSINTERVALL UND ZAHLUNGSBEDINGUNGEN]</span>.
+          In-App-Zahlungen von Restaurantgästen sind derzeit nicht Bestandteil von Servora.
+        </p>
+        <h2>5. Pflichten des Kunden</h2>
+        <p>
+          Der Kunde hält Stamm-, Team-, Produkt-, Steuer-, Allergen- und Reservierungsdaten
+          aktuell, vergibt Zugriffsrechte nach dem Erforderlichkeitsprinzip, schützt Zugangsdaten,
+          nutzt unterstützte Geräte und sorgt für eine geeignete Internetverbindung sowie
+          betriebliche Ersatzprozesse.
+        </p>
+        <h2>6. Datenschutz und Auftragsverarbeitung</h2>
+        <p>
+          Soweit Servora personenbezogene Daten im Auftrag verarbeitet, schließen die Parteien
+          vor Beginn der Verarbeitung eine Vereinbarung nach Art. 28 DSGVO. Der Kunde gewährleistet
+          die Rechtmäßigkeit der übermittelten Daten und erfüllt Informationspflichten gegenüber
+          Beschäftigten und Gästen.
+        </p>
+        <h2>7. Verfügbarkeit, Wartung und Support</h2>
+        <p>
+          Vereinbarte Verfügbarkeiten und Supportzeiten ergeben sich aus
+          <span class="placeholder">[LEISTUNGSBESCHREIBUNG / SLA]</span>.
+          Planbare Wartungen werden nach Möglichkeit angekündigt. Nicht geschuldete
+          Drittanbieter-, Internet-, Geräte- und Druckerdienste können Einschränkungen verursachen.
+        </p>
+        <h2>8. Laufzeit und Kündigung</h2>
+        <p>
+          Mindestlaufzeit, Verlängerung und Kündigungsfrist:
+          <span class="placeholder">[LAUFZEIT UND KÜNDIGUNGSFRIST]</span>.
+          Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt bestehen.
+        </p>
+        <h2>9. Datenrückgabe und Löschung</h2>
+        <p>
+          Nach Vertragsende kann der Kunde innerhalb von
+          <span class="placeholder">[EXPORTFRIST]</span> einen bereitgestellten Datenexport
+          abrufen. Anschließend werden Daten nach dem vereinbarten Löschkonzept entfernt,
+          soweit keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+        </p>
+        <h2>10. Gewährleistung und Haftung</h2>
+        <p>
+          Es gelten die gesetzlichen Vorschriften mit den für wirksam vereinbarten
+          B2B-Beschränkungen. Keine Beschränkung gilt bei Vorsatz, grober Fahrlässigkeit,
+          Verletzung von Leben, Körper oder Gesundheit, arglistigem Verschweigen, übernommener
+          Garantie oder zwingender gesetzlicher Haftung. Für leichte Fahrlässigkeit bei
+          wesentlichen Vertragspflichten ist die Haftung auf den typischerweise vorhersehbaren
+          Schaden begrenzt. Diese Klausel muss vor Verwendung rechtlich geprüft werden.
+        </p>
+        <h2>11. Änderungen</h2>
+        <p>
+          Änderungen von Leistungsumfang, Preisen oder Bedingungen erfolgen nur nach den
+          vertraglich und gesetzlich zulässigen Verfahren. Wesentliche nachteilige Änderungen
+          werden mit angemessener Frist angekündigt.
+        </p>
+        <h2>12. Recht und Gerichtsstand</h2>
+        <p>
+          Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Ausschließlicher
+          Gerichtsstand für Kaufleute:
+          <span class="placeholder">[SITZ / GERICHTSSTAND]</span>, soweit wirksam vereinbar.
+        </p>
+      </article>
+
+      <article data-legal-document="support" hidden>
+        <h1>Servora Support</h1>
+        <p class="legal-meta">Interner Hilfebereich · Entwurfsstand 26. Juli 2026</p>
+        <div class="draft-warning">
+          Dieser Supportbereich gehört zur geschützten Entwicklungsvorschau. Vor der
+          Veröffentlichung muss eine erreichbare Supportadresse eingetragen und der Bereich
+          ohne Entwicklungs-PIN öffentlich verfügbar gemacht werden.
+        </div>
+
+        <h2>Kontakt</h2>
+        <p>
+          Support-E-Mail: <span class="placeholder">[SUPPORT-E-MAIL]</span><br>
+          Datenschutzanfragen: <span class="placeholder">[DATENSCHUTZ-E-MAIL]</span><br>
+          Vorgesehene Supportzeiten: <span class="placeholder">[SUPPORTZEITEN]</span>
+        </p>
+
+        <h2>Problem vollständig melden</h2>
+        <p>Damit ein Fehler schnell nachvollzogen werden kann, sollte die Meldung Folgendes enthalten:</p>
+        <ul>
+          <li>App-Version und Buildnummer.</li>
+          <li>Gerätemodell und installierte iOS- oder iPadOS-Version.</li>
+          <li>Restaurantkennung, betroffene Rolle und Station, aber niemals Passwörter.</li>
+          <li>Die genauen Schritte bis zum Fehler sowie erwartetes und tatsächliches Verhalten.</li>
+          <li>Zeitpunkt des Fehlers und, sofern möglich, einen Screenshot ohne fremde personenbezogene Daten.</li>
+        </ul>
+
+        <h2>Schnelle Hilfe</h2>
+        <h3>App bleibt beim Start schwarz oder weiß</h3>
+        <p>
+          App vollständig schließen und erneut öffnen, Internetverbindung prüfen und den
+          neuesten TestFlight-Build installieren. Bleibt der Fehler bestehen, Buildnummer,
+          Gerät und Zeitpunkt an den Support senden.
+        </p>
+        <h3>Daten werden nicht gespeichert</h3>
+        <p>
+          Online-Status und Anmeldung prüfen. In Supabase müssen die aktuellen Migrationen
+          ausgeführt und die vorgesehenen RLS-Richtlinien aktiv sein. RLS nicht pauschal
+          deaktivieren. Die Fehlermeldung und betroffene Funktion an den Support übermitteln.
+        </p>
+        <h3>Reservierungslink ist noch nicht bereit</h3>
+        <p>
+          In Servora die Online-Reservierung aktivieren, die Einstellungen mit dem blauen
+          Haken speichern und warten, bis der Status „Veröffentlicht“ angezeigt wird.
+        </p>
+        <h3>Anmeldung funktioniert nicht</h3>
+        <p>
+          Restaurantkennung, Benutzername und Passwort auf Schreibfehler prüfen. Gerätezugänge
+          verwenden ihre eigene Gerätekennung und ihr Gerätepasswort und sind keine Mitarbeiterkonten.
+        </p>
+        <h3>Bon oder Druckauftrag fehlt</h3>
+        <p>
+          Stationszuweisung, Warteschlange, Druckerstatus und Netzwerk prüfen. Danach einen
+          Testdruck starten oder den fehlgeschlagenen Auftrag gezielt erneut senden.
+        </p>
+
+        <h2>Konto und Datenschutz</h2>
+        <p>
+          Kontolöschung wird in der App unter Einstellungen angefordert. Bei Auskunft,
+          Berichtigung oder Löschung von Reservierungsdaten ist zuerst das jeweilige Restaurant
+          zu kontaktieren. Für eine sichere Zuordnung sollte die Anfrage die Restaurantkennung
+          und eine Rückrufmöglichkeit enthalten.
+        </p>
+
+        <h2>Sicherheitsprobleme</h2>
+        <p>
+          Sicherheitslücken nicht öffentlich veröffentlichen. Bitte vertraulich an
+          <span class="placeholder">[SECURITY-E-MAIL]</span> melden. Niemals Passwörter,
+          Supabase-Service-Role-Schlüssel, vollständige Kundendatensätze oder Zahlungsdaten mitsenden.
+        </p>
+      </article>
+
+      <article data-legal-document="veroeffentlichung" hidden>
+        <h1>App veröffentlichen</h1>
+        <p class="legal-meta">Interne Freigabe-Checkliste · Stand 26. Juli 2026</p>
+        <div class="draft-warning">
+          Dies ist eine technische Arbeitsliste und keine Rechtsberatung. Servora darf erst
+          öffentlich freigegeben werden, wenn keine Platzhalter, Testkonten mit echten Daten
+          oder nur simulierte Kernfunktionen mehr enthalten sind.
+        </div>
+
+        <h2>1. Anbieter und Rechtstexte</h2>
+        <ul>
+          <li>Alle gelb markierten Anbieter-, Kontakt-, Register- und Steuerangaben ergänzen.</li>
+          <li>Impressum, Datenschutz, Nutzungsbedingungen und AGB fachlich und rechtlich prüfen lassen.</li>
+          <li>Support- und Datenschutz-E-Mail dauerhaft erreichbar einrichten.</li>
+          <li>Auftragsverarbeitung, Unterauftragnehmer, Supabase-Region und Löschfristen dokumentieren.</li>
+        </ul>
+
+        <h2>2. Supabase und Sicherheit</h2>
+        <ul>
+          <li><code>schema.sql</code>, <code>cloud_state_migration.sql</code>, <code>online_booking_migration.sql</code> und <code>account_deletion_migration.sql</code> in der vorgesehenen Reihenfolge ausführen.</li>
+          <li>Row Level Security aktiviert lassen und jede Rolle mit eigenen Testkonten prüfen.</li>
+          <li>Nur den Publishable Key in App und Website verwenden. Service-Role-Schlüssel niemals ausliefern.</li>
+          <li>Backups, Wiederherstellung, Löschanfragen und Fehlerprotokollierung testen.</li>
+        </ul>
+
+        <h2>3. Website und Reservierungslinks</h2>
+        <ul>
+          <li>Domain, DNS, HTTPS, GitHub-Pages-Deployment und persönliche Restaurantlinks testen.</li>
+          <li><code>DEVELOPMENT_MODE</code> auf <code>false</code> setzen und Entwicklungs-PIN samt Hash entfernen.</li>
+          <li>Support und Rechtstexte für die echte Veröffentlichung öffentlich erreichbar machen.</li>
+          <li>Robots-Einstellung erst auf Indexierung umstellen, wenn alle Inhalte freigegeben sind.</li>
+          <li>Reservierung auf iPhone, Android, Desktop und bei langsamer Verbindung vollständig testen.</li>
+        </ul>
+
+        <h2>4. Xcode und App-Build</h2>
+        <ul>
+          <li>Bundle-ID, Team, Signierung, App-Icon, Anzeigename und Mindestversion kontrollieren.</li>
+          <li>Benötigte Capabilities wie Associated Domains und App Groups korrekt konfigurieren.</li>
+          <li>Version und Buildnummer erhöhen, Release-Konfiguration bauen und Archive validieren.</li>
+          <li>Start, Anmeldung, Onboarding, Rollen, Offlineanzeige, Reservierungen, Bestellungen, Stationen und Kontolöschung auf echten Geräten testen.</li>
+        </ul>
+
+        <h2>5. App Store Connect</h2>
+        <ul>
+          <li>App-Beschreibung, Untertitel, Kategorie „Wirtschaft“, Altersfreigabe, Keywords und Screenshots hinterlegen.</li>
+          <li>Öffentliche Datenschutz-URL und Support-URL eintragen.</li>
+          <li>App-Datenschutzangaben anhand der tatsächlich erhobenen und verknüpften Daten beantworten.</li>
+          <li>Prüfhinweise, funktionierende Review-Zugangsdaten und ein vorbereitetes Testrestaurant bereitstellen.</li>
+          <li>Export-Compliance, Inhaltsrechte und Verschlüsselungsfragen wahrheitsgemäß beantworten.</li>
+        </ul>
+
+        <h2>6. Letzter Test</h2>
+        <ul>
+          <li>TestFlight-Build mit Restaurantleitung, Service und Gerätezugang durchspielen.</li>
+          <li>Eine komplette Stoßzeit mit Reservierungen, Tischwechseln, Nachbestellungen, Küche, Druck und Schichtwechsel simulieren.</li>
+          <li>Leere Zustände, Fehlermeldungen, abgelaufene Sitzungen und Verbindungsabbrüche prüfen.</li>
+          <li>Erst nach erfolgreichem End-to-End-Test zur App-Store-Prüfung einreichen.</li>
+        </ul>
+      </article>
+    </div>
+  </dialog>
 
   <script>
     (() => {
@@ -633,23 +1676,41 @@
 
       const SUPABASE_URL = "https://dlapwemckfhxklytbqkk.supabase.co";
       const SUPABASE_KEY = "sb_publishable_VeeQLARNn-sULZ4snvp3HA_Hd78H5RN";
+      const DEVELOPMENT_MODE = true;
       const DEVELOPMENT_PIN_HASH =
         "5f20b9b81da6a3163f1cc96b603868330378255157dae99d8a6d7cc5fa3d6a19";
       const ACCESS_SESSION_KEY = "servora-development-access";
       const params = new URLSearchParams(window.location.search);
       const publicID = params.get("r");
+      const requestedLegalDocument = window.location.hash.slice(1);
+      let siteStarted = false;
 
       const state = {
         snapshot: null,
         guests: 2,
-        selectedTime: null
+        selectedTime: null,
+        step: 1,
+        confirmationNumber: ""
       };
 
       const $ = (id) => document.getElementById(id);
-      const loading = $("loading");
-      const fatal = $("fatal");
       const form = $("booking-form");
       const settingsPath = ["restaurant", "settings"];
+
+      function nested(object, path, fallback) {
+        let value = object;
+        for (const key of path) value = value?.[key];
+        return value ?? fallback;
+      }
+
+      function escapeHTML(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
 
       async function sha256(value) {
         const bytes = new TextEncoder().encode(value);
@@ -664,19 +1725,21 @@
         $("site-content").removeAttribute("inert");
         $("site-content").removeAttribute("aria-hidden");
         document.body.classList.remove("gate-locked");
-        start();
+        if (!siteStarted) {
+          siteStarted = true;
+          start();
+        }
+        if (requestedLegalDocument) openLegal(requestedLegalDocument, false);
       }
 
       async function submitDevelopmentPIN(event) {
         event.preventDefault();
         const input = $("development-pin");
         const button = $("gate-submit");
-        const error = $("gate-error");
         button.disabled = true;
-        error.classList.add("hidden");
+        $("gate-error").classList.add("hidden");
 
-        const enteredHash = await sha256(input.value.trim());
-        if (enteredHash === DEVELOPMENT_PIN_HASH) {
+        if (await sha256(input.value.trim()) === DEVELOPMENT_PIN_HASH) {
           sessionStorage.setItem(ACCESS_SESSION_KEY, "granted");
           openDevelopmentPreview();
           return;
@@ -684,21 +1747,17 @@
 
         input.value = "";
         input.setAttribute("aria-invalid", "true");
-        error.classList.remove("hidden");
+        $("gate-error").classList.remove("hidden");
         button.disabled = false;
         input.focus();
       }
 
-      function nested(object, path, fallback) {
-        let value = object;
-        for (const key of path) value = value?.[key];
-        return value ?? fallback;
-      }
-
-      function showFatal(message) {
-        loading.classList.add("hidden");
+      function showFatal(message, title = "Reservierung nicht verfügbar") {
+        $("loading").classList.add("hidden");
         form.classList.add("hidden");
-        fatal.classList.remove("hidden");
+        $("stepbar").classList.add("hidden");
+        $("fatal").classList.remove("hidden");
+        $("fatal").querySelector("h2").textContent = title;
         $("fatal-message").textContent = message;
       }
 
@@ -721,7 +1780,7 @@
       }
 
       function eligibleTables(area) {
-        return (state.snapshot.tables || []).filter((table) =>
+        return (state.snapshot?.tables || []).filter((table) =>
           table.isOnlineBookable &&
           !table.isPlaceholder &&
           table.area === area &&
@@ -743,9 +1802,17 @@
         }).format(date);
       }
 
+      function formatDate(date) {
+        return new Intl.DateTimeFormat("de-DE", {
+          weekday: "short",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }).format(date);
+      }
+
       function renderSlots() {
         const container = $("slots");
-        const empty = $("empty-slots");
         container.replaceChildren();
         state.selectedTime = null;
 
@@ -784,7 +1851,7 @@
           }
         }
 
-        empty.classList.toggle("hidden", slots.length > 0);
+        $("empty-slots").classList.toggle("hidden", slots.length > 0);
         for (const slot of slots) {
           const button = document.createElement("button");
           button.type = "button";
@@ -808,22 +1875,49 @@
         const maximum = Number(nested(state.snapshot, [...settingsPath, "maximumPartySize"], 10));
         state.guests = Math.min(maximum, Math.max(1, state.guests + delta));
         $("guests").value = String(state.guests);
-        $("guests-value").textContent = `${state.guests} ${state.guests === 1 ? "Person" : "Personen"}`;
+        $("guests-value").textContent =
+          `${state.guests} ${state.guests === 1 ? "Person" : "Personen"}`;
         renderSlots();
       }
 
+      function summaryRow(label, value) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "summary-row";
+        const term = document.createElement("dt");
+        const description = document.createElement("dd");
+        term.textContent = label;
+        description.textContent = value || "–";
+        wrapper.append(term, description);
+        return wrapper;
+      }
+
       function updateSummary() {
+        if (!$("date").value) return;
         const date = parseLocalDate($("date").value);
         $("summary-guests").textContent = String(state.guests);
-        $("summary-date").textContent = new Intl.DateTimeFormat("de-DE", {
-          weekday: "short",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric"
-        }).format(date);
+        $("summary-date").textContent = formatDate(date);
         $("summary-time").textContent = state.selectedTime ? formatTime(state.selectedTime) : "–";
         $("summary-area").textContent = $("area").value || "–";
-        validate();
+        $("summary-compact").textContent = state.selectedTime
+          ? `${formatDate(date)}, ${formatTime(state.selectedTime)} Uhr`
+          : "Noch keine Uhrzeit gewählt";
+
+        const appointment = $("review-appointment");
+        appointment.replaceChildren(
+          summaryRow("Personen", String(state.guests)),
+          summaryRow("Datum", formatDate(date)),
+          summaryRow("Uhrzeit", state.selectedTime ? `${formatTime(state.selectedTime)} Uhr` : "–"),
+          summaryRow("Bereich", $("area").value)
+        );
+
+        const name = [$("first-name").value.trim(), $("last-name").value.trim()]
+          .filter(Boolean).join(" ");
+        const contact = $("review-contact");
+        contact.replaceChildren(
+          summaryRow("Name", name),
+          summaryRow("E-Mail", $("email").value.trim()),
+          summaryRow("Telefon", $("phone").value.trim())
+        );
       }
 
       function applyFieldRules() {
@@ -832,22 +1926,73 @@
           const visibility = rules[wrapper.dataset.publicField] || "Ausgeblendet";
           const control = wrapper.querySelector("input, textarea");
           wrapper.classList.toggle("hidden", visibility === "Ausgeblendet");
-          control.required = visibility === "Pflichtfeld";
-          if (visibility === "Optional") {
-            wrapper.querySelector("label").textContent =
-              `${wrapper.dataset.publicField} (optional)`;
+          if (control) control.required = visibility === "Pflichtfeld";
+
+          const label = wrapper.matches("label") ? wrapper : wrapper.querySelector("label");
+          if (label && visibility === "Optional" && !label.dataset.optionalApplied) {
+            const textNode = [...label.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+            if (textNode) textNode.textContent = `${textNode.textContent.trim()} (optional)`;
+            else label.append(" (optional)");
+            label.dataset.optionalApplied = "true";
           }
         }
+        const hasPreferences = [...$("preference-fields").querySelectorAll("[data-public-field]")]
+          .some((field) => !field.classList.contains("hidden"));
+        $("preference-fields").classList.toggle("hidden", !hasPreferences);
       }
 
-      function validate() {
-        const visibleRequired = [...form.querySelectorAll("input[required], textarea[required], select[required]")]
+      function visibleRequiredFields(step) {
+        return [...document.querySelector(`[data-booking-step="${step}"]`)
+          .querySelectorAll("input[required], textarea[required], select[required]")]
           .filter((element) => !element.closest(".hidden"));
-        const fieldsValid = visibleRequired.every((element) =>
-          element.type === "checkbox" ? element.checked : element.value.trim() !== ""
-        );
-        const contactValid = $("email").value.trim() !== "" || $("phone").value.trim() !== "";
-        $("submit").disabled = !(state.selectedTime && fieldsValid && contactValid);
+      }
+
+      function validateStep(step, showErrors = false) {
+        if (step === 1) return Boolean(state.selectedTime && $("date").value && $("area").value);
+
+        if (step === 2) {
+          let valid = true;
+          for (const element of visibleRequiredFields(2)) {
+            const fieldValid = element.type === "checkbox" ? element.checked : element.value.trim() !== "";
+            element.setAttribute("aria-invalid", showErrors && !fieldValid ? "true" : "false");
+            valid = valid && fieldValid;
+          }
+          const contactValid = $("email").value.trim() !== "" || $("phone").value.trim() !== "";
+          if (showErrors && !contactValid) {
+            $("contact-error").textContent =
+              "Bitte gib mindestens eine E-Mail-Adresse oder Telefonnummer an.";
+          }
+          $("contact-error").classList.toggle("hidden", !showErrors || contactValid);
+          return valid && contactValid;
+        }
+
+        if (step === 3) {
+          const allergyRequired = $("allergies").value.trim() !== "";
+          return $("privacy").checked && (!allergyRequired || $("allergy-consent").checked);
+        }
+        return true;
+      }
+
+      function goToStep(nextStep) {
+        if (nextStep > state.step && !validateStep(state.step, true)) return;
+        state.step = nextStep;
+        for (const section of document.querySelectorAll("[data-booking-step]")) {
+          section.classList.toggle("hidden", Number(section.dataset.bookingStep) !== nextStep);
+        }
+        for (const indicator of document.querySelectorAll("[data-step-indicator]")) {
+          if (Number(indicator.dataset.stepIndicator) === nextStep) {
+            indicator.setAttribute("aria-current", "step");
+          } else {
+            indicator.removeAttribute("aria-current");
+          }
+        }
+        if (nextStep === 3) {
+          updateSummary();
+          const hasAllergies = $("allergies").value.trim() !== "";
+          $("allergy-consent-wrap").classList.toggle("hidden", !hasAllergies);
+          $("allergy-consent").required = hasAllergies;
+        }
+        window.scrollTo({ top: $("stepbar").offsetTop, behavior: "smooth" });
       }
 
       function configureRestaurant(snapshot) {
@@ -856,12 +2001,15 @@
         document.title = `Reservieren bei ${restaurant.name}`;
         $("restaurant-name").textContent = restaurant.name;
         $("restaurant-description").textContent =
-          restaurant.description || "Schnell und verbindlich einen Tisch anfragen.";
+          restaurant.description || "Schnell und unkompliziert einen Tisch anfragen.";
+        $("booking-controller").textContent =
+          `${restaurant.name} ist für die Bearbeitung deiner Reservierungsdaten verantwortlich. ` +
+          `Kontakt: ${restaurant.email || restaurant.phone || restaurant.address || "siehe Reservierungsseite"}.`;
 
         if (restaurant.titleImageData) {
-          $("topbar").style.backgroundImage =
+          $("hero").style.backgroundImage =
             `url(data:image/jpeg;base64,${restaurant.titleImageData})`;
-          $("topbar").classList.add("has-image");
+          $("hero").classList.add("has-image");
         }
         if (restaurant.logoData) {
           $("logo").src = `data:image/jpeg;base64,${restaurant.logoData}`;
@@ -893,29 +2041,38 @@
           option.textContent = area;
           return option;
         }));
+        if (!configured.length) {
+          showFatal(
+            "Das Restaurant hat noch keinen online buchbaren Bereich eingerichtet.",
+            "Noch keine Tische freigegeben"
+          );
+          return;
+        }
 
         const info = [];
-        if (restaurant.address) info.push(`<div><strong>Adresse</strong><br>${escapeHTML(restaurant.address)}</div>`);
-        if (restaurant.openingHoursText) info.push(`<div><strong>Öffnungszeiten</strong><br>${escapeHTML(restaurant.openingHoursText)}</div>`);
-        if (restaurant.phone) info.push(`<div><strong>Telefon</strong><br><a href="tel:${encodeURIComponent(restaurant.phone)}">${escapeHTML(restaurant.phone)}</a></div>`);
+        if (restaurant.address) {
+          info.push(`<div><strong>Adresse</strong><br>${escapeHTML(restaurant.address)}</div>`);
+        }
+        if (restaurant.openingHoursText) {
+          info.push(`<div><strong>Öffnungszeiten</strong><br>${escapeHTML(restaurant.openingHoursText)}</div>`);
+        }
+        if (restaurant.phone) {
+          info.push(
+            `<div><strong>Telefon</strong><br>` +
+            `<a href="tel:${encodeURIComponent(restaurant.phone)}">${escapeHTML(restaurant.phone)}</a></div>`
+          );
+        }
+        if (restaurant.email) {
+          info.push(
+            `<div><strong>E-Mail</strong><br>` +
+            `<a href="mailto:${encodeURIComponent(restaurant.email)}">${escapeHTML(restaurant.email)}</a></div>`
+          );
+        }
         $("restaurant-info").innerHTML = info.join("");
         $("restaurant-info").classList.toggle("hidden", info.length === 0);
 
-        $("open-app").addEventListener("click", () => {
-          window.location.href = `servora://reservieren?r=${encodeURIComponent(publicID)}`;
-        });
-
         applyFieldRules();
         renderSlots();
-      }
-
-      function escapeHTML(value) {
-        return String(value)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
       }
 
       async function rpc(name, body) {
@@ -932,10 +2089,23 @@
         return data;
       }
 
+      function combinedNotes() {
+        const preferences = [];
+        if ($("high-chair").checked) preferences.push("Kinderstuhl gewünscht");
+        if ($("wheelchair").checked) preferences.push("Rollstuhlplatz gewünscht");
+        if ($("pet").checked) preferences.push("Haustier angekündigt");
+        return [$("notes").value.trim(), ...preferences].filter(Boolean).join("\n");
+      }
+
       async function submit(event) {
         event.preventDefault();
-        validate();
-        if ($("submit").disabled || !state.selectedTime) return;
+        if (!validateStep(3, true) || !state.selectedTime || !navigator.onLine) {
+          $("form-error").textContent = navigator.onLine
+            ? "Bitte bestätige die erforderlichen Datenschutzhinweise."
+            : "Du bist offline. Stelle die Verbindung wieder her und versuche es erneut.";
+          $("form-error").classList.remove("hidden");
+          return;
+        }
 
         $("submit").disabled = true;
         $("submit").textContent = "Wird gesendet …";
@@ -953,12 +2123,16 @@
             p_email: $("email").value.trim(),
             p_phone: $("phone").value.trim(),
             p_occasion: $("occasion").value.trim(),
-            p_notes: $("notes").value.trim(),
+            p_notes: combinedNotes(),
             p_allergies: $("allergies").value.trim(),
-            p_accepts_privacy: $("privacy").checked,
+            p_accepts_privacy:
+              $("privacy").checked &&
+              ($("allergies").value.trim() === "" || $("allergy-consent").checked),
             p_source: "website"
           });
+          state.confirmationNumber = result.confirmationNumber;
           form.classList.add("hidden");
+          $("stepbar").classList.add("hidden");
           $("confirmation").classList.remove("hidden");
           $("confirmation-title").textContent = result.isConfirmed
             ? "Reservierung bestätigt"
@@ -969,7 +2143,7 @@
         } catch (error) {
           $("form-error").textContent =
             error.message.includes("available")
-              ? "Diese Uhrzeit wurde gerade vergeben. Bitte wähle eine andere Zeit."
+              ? "Diese Uhrzeit wurde gerade vergeben. Bitte gehe zurück und wähle eine andere Zeit."
               : error.message;
           $("form-error").classList.remove("hidden");
           $("submit").disabled = false;
@@ -977,9 +2151,40 @@
         }
       }
 
+      function updateOnlineStatus() {
+        $("offline-banner").classList.toggle("hidden", navigator.onLine);
+      }
+
+      function openLegal(documentName, updateHash = true) {
+        if (
+          DEVELOPMENT_MODE &&
+          sessionStorage.getItem(ACCESS_SESSION_KEY) !== "granted"
+        ) {
+          return;
+        }
+        const article = document.querySelector(`[data-legal-document="${documentName}"]`);
+        if (!article) return;
+        for (const article of document.querySelectorAll("[data-legal-document]")) {
+          article.hidden = article.dataset.legalDocument !== documentName;
+        }
+        $("legal-dialog-title").textContent = article.querySelector("h1").textContent;
+        $("legal-dialog").showModal();
+        if (updateHash) history.replaceState(null, "", `#${documentName}`);
+      }
+
+      function closeLegal() {
+        $("legal-dialog").close();
+        if (window.location.hash) {
+          history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+        }
+      }
+
       async function start() {
         if (!publicID || !/^[0-9a-f-]{36}$/i.test(publicID)) {
-          showFatal("Dieser Reservierungslink ist unvollständig.");
+          showFatal(
+            "Öffne den persönlichen Reservierungslink des Restaurants. Die Startadresse allein enthält noch kein Restaurant.",
+            "Kein Restaurant ausgewählt"
+          );
           return;
         }
         try {
@@ -987,14 +2192,27 @@
             p_public_id: publicID
           });
           if (!state.snapshot?.restaurant?.settings?.bookingEnabled) {
-            showFatal("Dieses Restaurant nimmt momentan keine Online-Reservierungen an.");
+            showFatal(
+              "Dieses Restaurant nimmt momentan keine Online-Reservierungen an.",
+              "Online-Reservierung pausiert"
+            );
             return;
           }
-          loading.classList.add("hidden");
+          $("loading").classList.add("hidden");
+          $("fatal").classList.add("hidden");
+          $("stepbar").classList.remove("hidden");
           form.classList.remove("hidden");
           configureRestaurant(state.snapshot);
-        } catch {
-          showFatal("Das Restaurant konnte nicht geladen werden. Prüfe den Link und versuche es erneut.");
+        } catch (error) {
+          const unpublished =
+            error.message.includes("Booking link not found") ||
+            error.message.includes("not found");
+          showFatal(
+            unpublished
+              ? "Dieser Link wurde noch nicht veröffentlicht. Aktiviere die Online-Reservierung in Servora und speichere sie mit dem Haken."
+              : "Das Restaurant konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+            unpublished ? "Reservierungslink noch nicht bereit" : "Verbindung fehlgeschlagen"
+          );
         }
       }
 
@@ -1002,12 +2220,37 @@
       $("guests-plus").addEventListener("click", () => updateGuests(1));
       $("date").addEventListener("change", renderSlots);
       $("area").addEventListener("change", renderSlots);
-      form.addEventListener("input", validate);
+      form.addEventListener("input", updateSummary);
       form.addEventListener("submit", submit);
+      $("summary-toggle").addEventListener("click", () =>
+        $("summary-panel").classList.toggle("expanded")
+      );
       $("new-booking").addEventListener("click", () => window.location.reload());
+      $("copy-confirmation").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(state.confirmationNumber);
+        $("copy-confirmation").textContent = "Kopiert";
+      });
       $("gate-form").addEventListener("submit", submitDevelopmentPIN);
+      $("close-legal").addEventListener("click", closeLegal);
+      $("legal-dialog").addEventListener("click", (event) => {
+        if (event.target === $("legal-dialog")) closeLegal();
+      });
+      window.addEventListener("online", updateOnlineStatus);
+      window.addEventListener("offline", updateOnlineStatus);
 
-      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "granted") {
+      for (const button of document.querySelectorAll("[data-next-step]")) {
+        button.addEventListener("click", () => goToStep(Number(button.dataset.nextStep)));
+      }
+      for (const button of document.querySelectorAll("[data-previous-step]")) {
+        button.addEventListener("click", () => goToStep(Number(button.dataset.previousStep)));
+      }
+      for (const button of document.querySelectorAll("[data-legal]")) {
+        button.addEventListener("click", () => openLegal(button.dataset.legal));
+      }
+
+      updateOnlineStatus();
+
+      if (!DEVELOPMENT_MODE || sessionStorage.getItem(ACCESS_SESSION_KEY) === "granted") {
         openDevelopmentPreview();
       } else {
         $("development-pin").focus();
@@ -1016,4 +2259,3 @@
   </script>
 </body>
 </html>
-
