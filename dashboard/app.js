@@ -664,7 +664,7 @@ function quickAction(route, title, subtitle, symbol) {
 function emptyHTML(title, text) {
   return `
     <div class="empty-state">
-      <div class="empty-mark">S</div>
+      <img class="empty-mark" src="../assets/servora-app-icon.png" alt="">
       <h2>${escapeHTML(title)}</h2>
       <p>${escapeHTML(text)}</p>
     </div>
