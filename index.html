@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#0a5a49">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
   <meta name="description" content="Online einen Tisch reservieren – bereitgestellt mit Servora.">
+  <link rel="preconnect" href="https://dlapwemckfhxklytbqkk.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//dlapwemckfhxklytbqkk.supabase.co">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a5a49'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-size='36' font-weight='700' fill='white'%3ES%3C/text%3E%3C/svg%3E">
   <title>Servora Online-Reservierung</title>
   <style>
@@ -386,6 +388,16 @@
     }
 
     .field.full { grid-column: 1 / -1; }
+    fieldset.field {
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    fieldset.field legend {
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
 
     label {
       font-size: 14px;
@@ -474,12 +486,12 @@
 
     .slots {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
       gap: 9px;
     }
 
     .slot {
-      min-height: 46px;
+      min-height: 52px;
       padding: 8px;
       border: 1px solid #b7c4c0;
       border-radius: 7px;
@@ -491,6 +503,19 @@
     .slot[aria-pressed="true"] {
       border-color: var(--action);
       background: var(--action);
+      color: white;
+    }
+
+    .slot.waitlist {
+      border-color: #d58a35;
+      background: #fff7e8;
+      color: #74401e;
+      font-size: 13px;
+    }
+
+    .slot.waitlist[aria-pressed="true"] {
+      border-color: #a85d13;
+      background: #a85d13;
       color: white;
     }
 
@@ -528,6 +553,8 @@
       font-size: 14px;
       line-height: 1.45;
     }
+
+    #waitlist-notice { margin-top: 12px; }
 
     .notice.error {
       border-left-color: var(--danger);
@@ -1037,6 +1064,10 @@
 
             <p class="section-label">Verfügbare Uhrzeiten</p>
             <div class="slots" id="slots" aria-label="Verfügbare Uhrzeiten"></div>
+            <div class="notice hidden" id="waitlist-notice">
+              Mit „Warteliste“ gekennzeichnete Zeiten sind ausgebucht. Dein Eintrag ist
+              noch keine Reservierung; das Restaurant meldet sich, sobald ein Tisch frei wird.
+            </div>
             <div class="empty-slots hidden" id="empty-slots">
               Für diese Auswahl ist aktuell kein passender Tisch frei. Probiere ein anderes
               Datum, eine andere Gästezahl oder einen anderen Bereich.
@@ -1073,6 +1104,27 @@
                 <label for="phone">Telefonnummer</label>
                 <input type="tel" id="phone" autocomplete="tel">
               </div>
+              <fieldset class="field full" data-public-field="Adresse">
+                <legend>Adresse</legend>
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="street">Straße</label>
+                    <input id="street" autocomplete="address-line1">
+                  </div>
+                  <div class="field">
+                    <label for="house-number">Hausnummer</label>
+                    <input id="house-number" autocomplete="address-line2">
+                  </div>
+                  <div class="field">
+                    <label for="postal-code">Postleitzahl</label>
+                    <input id="postal-code" autocomplete="postal-code" inputmode="numeric">
+                  </div>
+                  <div class="field">
+                    <label for="city">Ort</label>
+                    <input id="city" autocomplete="address-level2">
+                  </div>
+                </div>
+              </fieldset>
               <div class="field full" data-public-field="Anlass">
                 <label for="occasion">Anlass</label>
                 <input id="occasion" autocomplete="off">
@@ -1191,7 +1243,23 @@
         <p class="field-hint">Bewahre die Reservierungsnummer für Rückfragen auf.</p>
         <div class="confirmation-actions">
           <button class="secondary" type="button" id="copy-confirmation">Nummer kopieren</button>
+          <button class="secondary hidden" type="button" id="manage-reservation">Reservierung verwalten</button>
           <button class="primary" type="button" id="new-booking">Weitere Reservierung</button>
+        </div>
+      </section>
+
+      <section class="confirmation hidden" id="cancellation-manager" aria-live="polite">
+        <div class="confirmation-mark" aria-hidden="true">i</div>
+        <h2 id="cancellation-title">Reservierung verwalten</h2>
+        <div class="confirmation-code" id="cancellation-code"></div>
+        <div class="review-block">
+          <dl class="summary-list" id="cancellation-details"></dl>
+        </div>
+        <p id="cancellation-message"></p>
+        <div class="notice error hidden" id="cancellation-error" role="alert"></div>
+        <div class="confirmation-actions">
+          <button class="secondary" type="button" id="back-to-booking">Zur Reservierungsseite</button>
+          <button class="primary" type="button" id="cancel-reservation">Reservierung stornieren</button>
         </div>
       </section>
     </main>
@@ -1355,7 +1423,8 @@
         <h2>Zweck und Rechtsgrundlage</h2>
         <p>
           Deine Angaben werden verwendet, um die Reservierung anzunehmen, zu bestätigen,
-          Rückfragen zu klären, einen Tisch einzuplanen und die Reservierung durchzuführen.
+          Rückfragen zu klären, einen Tisch einzuplanen, einen gewünschten Wartelisteneintrag
+          zu verwalten und die Reservierung durchzuführen.
           Erforderliche Reservierungsdaten werden zur Durchführung vorvertraglicher Maßnahmen
           und des Reservierungsverhältnisses verarbeitet.
         </p>
@@ -1371,8 +1440,18 @@
         <p>
           Zugriff erhalten nur berechtigte Beschäftigte des Restaurants und die für den Betrieb
           eingesetzten technischen Dienstleister. Servora verarbeitet die Daten als Plattformdienst.
+          Für Bestätigungen, Statusänderungen und Stornierungen kann ein E-Mail-Versanddienst
+          Empfängeradresse und Nachrichteninhalt verarbeiten.
           Das Restaurant legt die konkrete Aufbewahrungsdauer fest und löscht Daten, sobald sie
           nicht mehr benötigt werden oder gesetzliche Pflichten nicht entgegenstehen.
+        </p>
+        <h2>Bestätigung und Stornierung</h2>
+        <p>
+          Je nach Einstellung des Restaurants wird eine verfügbare Reservierung sofort bestätigt
+          oder zunächst als Anfrage gespeichert. Der persönliche Verwaltungslink enthält eine
+          zufällige Kennung. Wer Zugriff auf diesen Link hat, kann den Reservierungsstatus einsehen
+          und innerhalb der vom Restaurant festgelegten Frist stornieren. Teile den Link deshalb
+          nicht öffentlich.
         </p>
         <h2>Deine Rechte</h2>
         <p>
@@ -1419,7 +1498,9 @@
           Eine Reservierungsanfrage ist erst verbindlich bestätigt, wenn die Seite dies
           ausdrücklich anzeigt oder das Restaurant die Bestätigung erteilt. Das Restaurant
           entscheidet über Verfügbarkeit, Stornierung, Verspätung und Bewirtung. Servora ist
-          technischer Vermittler und nicht Vertragspartner der Bewirtungsleistung.
+          technischer Vermittler und nicht Vertragspartner der Bewirtungsleistung. Ein
+          Wartelisteneintrag reserviert noch keinen Tisch; das Restaurant muss die Anfrage
+          ausdrücklich übernehmen.
         </p>
         <h2>6. Verfügbarkeit und Änderungen</h2>
         <p>
@@ -1627,7 +1708,8 @@
 
         <h2>2. Supabase und Sicherheit</h2>
         <ul>
-          <li><code>schema.sql</code>, <code>cloud_state_migration.sql</code>, <code>online_booking_migration.sql</code> und <code>account_deletion_migration.sql</code> in der vorgesehenen Reihenfolge ausführen.</li>
+          <li><code>schema.sql</code>, <code>cloud_state_migration.sql</code>, <code>online_booking_migration.sql</code>, <code>booking_availability_waitlist_migration.sql</code>, <code>reservation_confirmation_email_migration.sql</code> und <code>account_deletion_migration.sql</code> in der vorgesehenen Reihenfolge ausführen.</li>
+          <li>Die Edge Function für Reservierungs-E-Mails deployen und Absenderdomain, API-Key sowie öffentliche Reservierungsadresse als geschützte Secrets konfigurieren.</li>
           <li>Row Level Security aktiviert lassen und jede Rolle mit eigenen Testkonten prüfen.</li>
           <li>Nur den Publishable Key in App und Website verwenden. Service-Role-Schlüssel niemals ausliefern.</li>
           <li>Backups, Wiederherstellung, Löschanfragen und Fehlerprotokollierung testen.</li>
@@ -1682,6 +1764,7 @@
       const ACCESS_SESSION_KEY = "servora-development-access";
       const params = new URLSearchParams(window.location.search);
       const publicID = params.get("r");
+      const cancellationToken = params.get("cancel");
       const requestedLegalDocument = window.location.hash.slice(1);
       let siteStarted = false;
 
@@ -1689,8 +1772,10 @@
         snapshot: null,
         guests: 2,
         selectedTime: null,
+        selectedIsWaitlist: false,
         step: 1,
-        confirmationNumber: ""
+        confirmationNumber: "",
+        cancellationToken: null
       };
 
       const $ = (id) => document.getElementById(id);
@@ -1788,8 +1873,23 @@
         );
       }
 
+      function bookingBlockOverlaps(block, slot, durationMinutes, area, tableID = null) {
+        if (block?.isActive === false) return false;
+        const startsAt = new Date(block?.startsAt);
+        const endsAt = new Date(block?.endsAt);
+        if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime())) return false;
+        const slotEnd = new Date(slot.getTime() + durationMinutes * 60_000);
+        if (!(slot < endsAt && slotEnd > startsAt)) return false;
+        if (block.scope === "all") return true;
+        if (block.scope === "area") return block.area === area;
+        if (block.scope === "table") return tableID && block.tableID === tableID;
+        return false;
+      }
+
       function overlaps(slot, reservation, durationMinutes) {
-        if (!["Geplant", "Platziert"].includes(reservation.status)) return false;
+        if (!["Zu bestätigen", "Geplant", "Platziert"].includes(reservation.status)) {
+          return false;
+        }
         if (reservation.area && reservation.area !== $("area").value) return false;
         const time = new Date(reservation.date);
         return Math.abs(time.getTime() - slot.getTime()) < durationMinutes * 60_000;
@@ -1815,6 +1915,7 @@
         const container = $("slots");
         container.replaceChildren();
         state.selectedTime = null;
+        state.selectedIsWaitlist = false;
 
         const date = parseLocalDate($("date").value);
         const day = daySettings(date);
@@ -1825,6 +1926,10 @@
         const duration = Math.max(Number(settings.standardDurationMinutes || 90), 15);
         const lead = Number(settings.minimumLeadMinutes || 0) * 60_000;
         const earliest = Date.now() + lead;
+        const blockedPeriods = Array.isArray(settings.blockedPeriods)
+          ? settings.blockedPeriods
+          : [];
+        const waitlistEnabled = settings.waitlistEnabled !== false;
         const slots = [];
 
         if (day?.isOpen && tables.length) {
@@ -1843,27 +1948,56 @@
                 0
               );
               if (slot.getTime() < earliest) continue;
+              const areaBlocked = blockedPeriods.some((block) =>
+                block.scope !== "table" &&
+                bookingBlockOverlaps(block, slot, duration, area)
+              );
+              if (areaBlocked) continue;
+              const availableTables = tables.filter((table) =>
+                !blockedPeriods.some((block) =>
+                  block.scope === "table" &&
+                  bookingBlockOverlaps(block, slot, duration, area, table.id)
+                )
+              );
+              if (!availableTables.length) continue;
               const occupied = (state.snapshot.reservations || [])
                 .filter((reservation) => overlaps(slot, reservation, duration))
                 .length;
-              if (occupied < tables.length) slots.push(slot);
+              if (occupied < availableTables.length) {
+                slots.push({ time: slot, isWaitlist: false });
+              } else if (waitlistEnabled) {
+                slots.push({ time: slot, isWaitlist: true });
+              }
             }
           }
         }
 
         $("empty-slots").classList.toggle("hidden", slots.length > 0);
+        $("waitlist-notice").classList.toggle(
+          "hidden",
+          !slots.some((slot) => slot.isWaitlist)
+        );
         for (const slot of slots) {
           const button = document.createElement("button");
           button.type = "button";
-          button.className = "slot";
-          button.textContent = formatTime(slot);
+          button.className = slot.isWaitlist ? "slot waitlist" : "slot";
+          button.textContent = slot.isWaitlist
+            ? `${formatTime(slot.time)} · Warteliste`
+            : formatTime(slot.time);
+          button.setAttribute(
+            "aria-label",
+            slot.isWaitlist
+              ? `${formatTime(slot.time)} Uhr, nur Warteliste`
+              : `${formatTime(slot.time)} Uhr, verfügbar`
+          );
           button.setAttribute("aria-pressed", "false");
           button.addEventListener("click", () => {
             for (const current of container.querySelectorAll(".slot")) {
               current.setAttribute("aria-pressed", "false");
             }
             button.setAttribute("aria-pressed", "true");
-            state.selectedTime = slot;
+            state.selectedTime = slot.time;
+            state.selectedIsWaitlist = slot.isWaitlist;
             updateSummary();
           });
           container.append(button);
@@ -1896,11 +2030,22 @@
         const date = parseLocalDate($("date").value);
         $("summary-guests").textContent = String(state.guests);
         $("summary-date").textContent = formatDate(date);
-        $("summary-time").textContent = state.selectedTime ? formatTime(state.selectedTime) : "–";
+        $("summary-time").textContent = state.selectedTime
+          ? `${formatTime(state.selectedTime)}${state.selectedIsWaitlist ? " · Warteliste" : ""}`
+          : "–";
         $("summary-area").textContent = $("area").value || "–";
         $("summary-compact").textContent = state.selectedTime
-          ? `${formatDate(date)}, ${formatTime(state.selectedTime)} Uhr`
+          ? `${formatDate(date)}, ${formatTime(state.selectedTime)} Uhr${state.selectedIsWaitlist ? " · Warteliste" : ""}`
           : "Noch keine Uhrzeit gewählt";
+        $("submit").textContent = state.selectedIsWaitlist
+          ? "Auf Warteliste setzen"
+          : nested(
+              state.snapshot,
+              [...settingsPath, "automaticConfirmation"],
+              true
+            )
+            ? "Verbindlich reservieren"
+            : "Reservierung anfragen";
 
         const appointment = $("review-appointment");
         appointment.replaceChildren(
@@ -1912,11 +2057,18 @@
 
         const name = [$("first-name").value.trim(), $("last-name").value.trim()]
           .filter(Boolean).join(" ");
+        const address = [
+          [$("street").value.trim(), $("house-number").value.trim()]
+            .filter(Boolean).join(" "),
+          [$("postal-code").value.trim(), $("city").value.trim()]
+            .filter(Boolean).join(" ")
+        ].filter(Boolean).join(", ");
         const contact = $("review-contact");
         contact.replaceChildren(
           summaryRow("Name", name),
           summaryRow("E-Mail", $("email").value.trim()),
-          summaryRow("Telefon", $("phone").value.trim())
+          summaryRow("Telefon", $("phone").value.trim()),
+          summaryRow("Adresse", address)
         );
       }
 
@@ -1924,11 +2076,15 @@
         const rules = nested(state.snapshot, [...settingsPath, "fieldVisibility"], {});
         for (const wrapper of document.querySelectorAll("[data-public-field]")) {
           const visibility = rules[wrapper.dataset.publicField] || "Ausgeblendet";
-          const control = wrapper.querySelector("input, textarea");
+          const controls = [...wrapper.querySelectorAll("input, textarea, select")];
           wrapper.classList.toggle("hidden", visibility === "Ausgeblendet");
-          if (control) control.required = visibility === "Pflichtfeld";
+          for (const control of controls) {
+            control.required = visibility === "Pflichtfeld";
+          }
 
-          const label = wrapper.matches("label") ? wrapper : wrapper.querySelector("label");
+          const label = wrapper.matches("label")
+            ? wrapper
+            : wrapper.querySelector("legend, label");
           if (label && visibility === "Optional" && !label.dataset.optionalApplied) {
             const textNode = [...label.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
             if (textNode) textNode.textContent = `${textNode.textContent.trim()} (optional)`;
@@ -2122,32 +2278,149 @@
             p_last_name: $("last-name").value.trim(),
             p_email: $("email").value.trim(),
             p_phone: $("phone").value.trim(),
+            p_street: $("street").value.trim(),
+            p_house_number: $("house-number").value.trim(),
+            p_postal_code: $("postal-code").value.trim(),
+            p_city: $("city").value.trim(),
             p_occasion: $("occasion").value.trim(),
             p_notes: combinedNotes(),
             p_allergies: $("allergies").value.trim(),
             p_accepts_privacy:
               $("privacy").checked &&
               ($("allergies").value.trim() === "" || $("allergy-consent").checked),
-            p_source: "website"
+            p_source: "website",
+            p_join_waitlist: state.selectedIsWaitlist
           });
           state.confirmationNumber = result.confirmationNumber;
+          state.cancellationToken = result.cancellationToken || null;
+          if (result.emailEventID) {
+            dispatchReservationEmail(result.emailEventID);
+          }
           form.classList.add("hidden");
           $("stepbar").classList.add("hidden");
           $("confirmation").classList.remove("hidden");
-          $("confirmation-title").textContent = result.isConfirmed
-            ? "Reservierung bestätigt"
-            : "Anfrage eingegangen";
+          $("confirmation-title").textContent = result.isWaitlisted
+            ? "Auf Warteliste eingetragen"
+            : result.isConfirmed
+              ? "Reservierung bestätigt"
+              : "Anfrage eingegangen";
           $("confirmation-code").textContent = result.confirmationNumber;
           $("confirmation-message").textContent = result.message;
+          $("manage-reservation").classList.toggle(
+            "hidden",
+            !state.cancellationToken
+          );
           window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (error) {
-          $("form-error").textContent =
-            error.message.includes("available")
-              ? "Diese Uhrzeit wurde gerade vergeben. Bitte gehe zurück und wähle eine andere Zeit."
-              : error.message;
+          if (error.message.includes("Waitlist is full")) {
+            $("form-error").textContent =
+              "Die Warteliste für diese Uhrzeit ist inzwischen voll. Bitte wähle eine andere Zeit.";
+          } else if (error.message.includes("blocked")) {
+            $("form-error").textContent =
+              "Diese Uhrzeit wurde vom Restaurant gerade gesperrt. Bitte wähle eine andere Zeit.";
+          } else if (
+            error.message.includes("available") ||
+            error.message.includes("full")
+          ) {
+            $("form-error").textContent =
+              "Diese Uhrzeit wurde gerade vergeben. Bitte gehe zurück und aktualisiere die Auswahl.";
+          } else {
+            $("form-error").textContent = error.message;
+          }
           $("form-error").classList.remove("hidden");
           $("submit").disabled = false;
-          $("submit").textContent = "Reservierung anfragen";
+          $("submit").textContent = state.selectedIsWaitlist
+            ? "Auf Warteliste setzen"
+            : nested(
+                state.snapshot,
+                [...settingsPath, "automaticConfirmation"],
+                true
+              )
+              ? "Verbindlich reservieren"
+              : "Reservierung anfragen";
+        }
+      }
+
+      async function dispatchReservationEmail(eventID) {
+        if (!eventID) return;
+        try {
+          await fetch(`${SUPABASE_URL}/functions/v1/reservation-email`, {
+            method: "POST",
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ eventID })
+          });
+        } catch {
+          // A mail failure must never undo a successfully stored reservation.
+        }
+      }
+
+      async function loadCancellation() {
+        try {
+          const reservation = await rpc(
+            "get_public_reservation_for_cancellation",
+            { p_token: cancellationToken }
+          );
+          $("loading").classList.add("hidden");
+          $("fatal").classList.add("hidden");
+          $("cancellation-manager").classList.remove("hidden");
+          $("restaurant-name").textContent = reservation.restaurantName;
+          $("restaurant-description").textContent = "Reservierung sicher verwalten.";
+          $("cancellation-code").textContent = reservation.confirmationNumber;
+          $("cancellation-details").replaceChildren(
+            summaryRow("Gast", reservation.guestName),
+            summaryRow(
+              "Termin",
+              new Date(reservation.startsAt).toLocaleString("de-DE", {
+                dateStyle: "medium",
+                timeStyle: "short"
+              })
+            ),
+            summaryRow("Personen", String(reservation.guests)),
+            summaryRow("Bereich", reservation.area),
+            summaryRow("Status", reservation.statusLabel)
+          );
+          $("cancel-reservation").disabled = !reservation.canCancel;
+          $("cancel-reservation").classList.toggle("hidden", !reservation.canCancel);
+          $("cancellation-message").textContent = reservation.canCancel
+            ? "Du kannst diese Reservierung hier verbindlich stornieren."
+            : reservation.status === "cancelled"
+              ? "Diese Reservierung wurde bereits storniert."
+              : "Die Online-Stornierungsfrist ist abgelaufen. Bitte kontaktiere das Restaurant direkt.";
+        } catch {
+          showFatal(
+            "Der Verwaltungslink ist ungültig oder nicht mehr verfügbar.",
+            "Reservierung nicht gefunden"
+          );
+        }
+      }
+
+      async function cancelReservation() {
+        const button = $("cancel-reservation");
+        button.disabled = true;
+        button.textContent = "Wird storniert …";
+        $("cancellation-error").classList.add("hidden");
+        try {
+          const result = await rpc("cancel_public_reservation", {
+            p_token: cancellationToken
+          });
+          if (result.emailEventID) {
+            dispatchReservationEmail(result.emailEventID);
+          }
+          $("cancellation-title").textContent = "Reservierung storniert";
+          $("cancellation-message").textContent =
+            "Die Stornierung wurde gespeichert. Das Restaurant wurde informiert.";
+          button.classList.add("hidden");
+        } catch (error) {
+          $("cancellation-error").textContent = error.message.includes("deadline")
+            ? "Die Online-Stornierungsfrist ist abgelaufen. Bitte kontaktiere das Restaurant."
+            : error.message;
+          $("cancellation-error").classList.remove("hidden");
+          button.disabled = false;
+          button.textContent = "Reservierung stornieren";
         }
       }
 
@@ -2180,6 +2453,10 @@
       }
 
       async function start() {
+        if (cancellationToken && /^[0-9a-f-]{36}$/i.test(cancellationToken)) {
+          await loadCancellation();
+          return;
+        }
         if (!publicID || !/^[0-9a-f-]{36}$/i.test(publicID)) {
           showFatal(
             "Öffne den persönlichen Reservierungslink des Restaurants. Die Startadresse allein enthält noch kein Restaurant.",
@@ -2229,6 +2506,17 @@
       $("copy-confirmation").addEventListener("click", async () => {
         await navigator.clipboard.writeText(state.confirmationNumber);
         $("copy-confirmation").textContent = "Kopiert";
+      });
+      $("manage-reservation").addEventListener("click", () => {
+        if (!state.cancellationToken) return;
+        window.location.href =
+          `${window.location.pathname}?cancel=${encodeURIComponent(state.cancellationToken)}`;
+      });
+      $("cancel-reservation").addEventListener("click", cancelReservation);
+      $("back-to-booking").addEventListener("click", () => {
+        window.location.href = publicID
+          ? `${window.location.pathname}?r=${encodeURIComponent(publicID)}`
+          : window.location.pathname;
       });
       $("gate-form").addEventListener("submit", submitDevelopmentPIN);
       $("close-legal").addEventListener("click", closeLegal);
