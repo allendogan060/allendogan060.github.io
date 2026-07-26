@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d4a3c">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <title>Servora Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d4a3c'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-size='36' font-weight='700' fill='white'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="offline-banner hidden" id="offline-banner" role="status">
+    Offline – Änderungen sind erst wieder online möglich.
+  </div>
+
+  <section class="development-gate" id="development-gate" aria-label="Entwicklungsvorschau">
+    <div class="gate-brand"><span class="brand-mark">S</span><strong>Servora</strong></div>
+    <p class="eyebrow">Nicht öffentlich</p>
+    <h1>Entwicklungsvorschau</h1>
+    <p>Das Web-Dashboard befindet sich im geschützten Funktionstest.</p>
+    <form id="gate-form">
+      <label class="field">
+        <span>Zugangs-PIN</span>
+        <input id="gate-pin" inputmode="numeric" autocomplete="one-time-code" required>
+      </label>
+      <p class="form-error hidden" id="gate-error" role="alert">Die PIN ist nicht richtig.</p>
+      <button class="primary full" type="submit">Vorschau öffnen</button>
+    </form>
+  </section>
+
+  <main class="auth-shell hidden" id="auth-shell">
+    <section class="auth-brand">
+      <div class="brand-lockup"><span class="brand-mark large">S</span><span>Servora</span></div>
+      <div>
+        <p class="eyebrow">Restaurantbetrieb</p>
+        <h1>Dein Betrieb. Ein Arbeitsbereich.</h1>
+        <p>Tische, Reservierungen, Bestellungen und Team greifen auf denselben Servora-Datenstand wie die App zu.</p>
+      </div>
+      <div class="auth-points" aria-label="Vorteile">
+        <span>Live synchronisiert</span>
+        <span>Rollenbasiert</span>
+        <span>Für Mobil und Desktop</span>
+      </div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-heading">
+        <p class="eyebrow">Servora Web</p>
+        <h2 id="auth-title">Anmelden</h2>
+        <p id="auth-subtitle">Mit Restaurantkennung und persönlichem Zugang.</p>
+      </div>
+
+      <div class="segmented" role="tablist" aria-label="Zugang">
+        <button class="selected" id="login-tab" role="tab" aria-selected="true" type="button">Anmelden</button>
+        <button id="register-tab" role="tab" aria-selected="false" type="button">Restaurant erstellen</button>
+      </div>
+
+      <form id="login-form">
+        <label class="field">
+          <span>Restaurantkennung</span>
+          <input id="login-code" autocomplete="organization" placeholder="z. B. SERV-ABCD" required>
+        </label>
+        <label class="field">
+          <span>Benutzername</span>
+          <input id="login-username" autocomplete="username" required>
+        </label>
+        <label class="field">
+          <span>Passwort</span>
+          <input id="login-password" type="password" autocomplete="current-password" minlength="6" required>
+        </label>
+        <p class="field-hint">Geräte- und Druckerzugänge werden ausschließlich in der Servora-App verwendet.</p>
+        <p class="form-error hidden" id="login-error" role="alert"></p>
+        <button class="primary full" id="login-submit" type="submit">Anmelden</button>
+      </form>
+
+      <form class="hidden" id="register-form">
+        <div class="field-grid">
+          <label class="field">
+            <span>Restaurantname</span>
+            <input id="register-name" autocomplete="organization" required>
+          </label>
+          <label class="field">
+            <span>Betriebsart</span>
+            <select id="register-type">
+              <option>Restaurant</option>
+              <option>Café</option>
+              <option>Bar</option>
+              <option>Eisdiele</option>
+              <option>Foodtruck</option>
+              <option>Hotelrestaurant</option>
+              <option>Eventgastronomie</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span>Dein Name</span>
+          <input id="register-display-name" autocomplete="name" required>
+        </label>
+        <label class="field">
+          <span>Benutzername</span>
+          <input id="register-username" autocomplete="username" minlength="2" required>
+        </label>
+        <label class="field">
+          <span>Passwort</span>
+          <input id="register-password" type="password" autocomplete="new-password" minlength="8" required>
+        </label>
+        <label class="check">
+          <input id="register-terms" type="checkbox" required>
+          <span>Ich bestätige, dass ich den Betrieb anlegen darf und akzeptiere die Testbedingungen.</span>
+        </label>
+        <p class="form-error hidden" id="register-error" role="alert"></p>
+        <button class="primary full" id="register-submit" type="submit">Restaurant sicher erstellen</button>
+      </form>
+    </section>
+  </main>
+
+  <div class="app-shell hidden" id="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-mark">S</span>
+        <div><strong>Servora</strong><small>Web Dashboard</small></div>
+      </div>
+      <nav id="desktop-navigation" aria-label="Hauptnavigation"></nav>
+      <div class="sidebar-user">
+        <strong id="sidebar-user-name">–</strong>
+        <span id="sidebar-user-role">–</span>
+        <button class="quiet" id="logout-button" type="button">Abmelden</button>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="workspace-header">
+        <div>
+          <p class="eyebrow" id="restaurant-code">–</p>
+          <h1 id="page-title">Start</h1>
+        </div>
+        <div class="header-actions">
+          <span class="sync-state" id="sync-state"><i></i><span>Aktuell</span></span>
+          <button class="icon-button" id="refresh-button" type="button" aria-label="Aktualisieren" title="Aktualisieren">↻</button>
+          <button class="restaurant-switch" id="restaurant-button" type="button">
+            <span id="restaurant-name">Restaurant</span>
+            <small id="restaurant-role">–</small>
+          </button>
+        </div>
+      </header>
+      <section class="view" id="view" aria-live="polite"></section>
+    </main>
+
+    <nav class="mobile-navigation" id="mobile-navigation" aria-label="Mobile Hauptnavigation"></nav>
+  </div>
+
+  <dialog id="modal">
+    <div class="modal-shell" id="modal-shell">
+      <header>
+        <div>
+          <p class="eyebrow" id="modal-eyebrow">Servora</p>
+          <h2 id="modal-title">Bearbeiten</h2>
+        </div>
+        <button class="icon-button" type="button" data-modal-action="close" aria-label="Schließen" title="Schließen">×</button>
+      </header>
+      <div class="modal-body" id="modal-body"></div>
+      <footer class="modal-footer" id="modal-footer"></footer>
+    </div>
+  </dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+  <template id="empty-template">
+    <div class="empty-state">
+      <div class="empty-mark">S</div>
+      <h2></h2>
+      <p></p>
+    </div>
+  </template>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
