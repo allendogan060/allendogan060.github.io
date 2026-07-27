@@ -131,7 +131,7 @@ begin
       'activeShiftStart', 'activeBreakStart', 'accumulatedBreak',
       'shiftRecords', 'scheduledShifts', 'shiftRequests', 'absenceRequests', 'paymentMethods',
       'paymentRecords', 'counterSales', 'vouchers', 'voucherConfiguration',
-      'printers', 'printJobs', 'onlineBookingConfiguration',
+      'kitchenOperatingMode', 'printers', 'printJobs', 'onlineBookingConfiguration',
       'servoraPlusEntitlement', 'fiscalConfiguration', 'fiscalReceipts',
       'cashDaySessions', 'fiscalAuditEvents'
     ];
