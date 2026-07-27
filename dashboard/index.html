@@ -1,205 +1,180 @@
--- Servora web dashboard: role-aware workspace loading and atomic state patches.
--- Run after cloud_state_migration.sql.
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d4a3c">
+  <meta name="application-name" content="Servora">
+  <meta name="apple-mobile-web-app-title" content="Servora">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <title>Servora Dashboard</title>
+  <link rel="icon" type="image/png" sizes="256x256" href="../assets/servora-app-icon.png?v=3">
+  <link rel="shortcut icon" type="image/png" href="../assets/servora-app-icon.png?v=3">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/servora-app-icon.png?v=3">
+  <link rel="stylesheet" href="./styles.css?v=4">
+</head>
+<body>
+  <div class="offline-banner hidden" id="offline-banner" role="status">
+    Offline – Änderungen sind erst wieder online möglich.
+  </div>
 
-begin;
+  <section class="development-gate" id="development-gate" aria-label="Entwicklungsvorschau">
+    <div class="gate-brand"><img class="brand-mark" src="../assets/servora-app-icon.png" alt=""><strong>Servora</strong></div>
+    <p class="eyebrow">Nicht öffentlich</p>
+    <h1>Entwicklungsvorschau</h1>
+    <p>Das Web-Dashboard befindet sich im geschützten Funktionstest.</p>
+    <form id="gate-form">
+      <label class="field">
+        <span>Zugangs-PIN</span>
+        <input id="gate-pin" inputmode="numeric" autocomplete="one-time-code" required>
+      </label>
+      <p class="form-error hidden" id="gate-error" role="alert">Die PIN ist nicht richtig.</p>
+      <button class="primary full" type="submit">Vorschau öffnen</button>
+    </form>
+  </section>
 
-create or replace function public.web_get_restaurant_workspace(
-  p_restaurant_id uuid default null
-)
-returns jsonb
-language sql
-stable
-security definer
-set search_path = 'pg_catalog'
-as $$
-  select jsonb_build_object(
-    'restaurantId', restaurant_row.id,
-    'restaurantName', restaurant_row.name,
-    'restaurantCode', restaurant_row.code::text,
-    'restaurantType', restaurant_row.restaurant_type,
-    'username', member_row.username::text,
-    'displayName', member_row.display_name,
-    'role', member_row.role,
-    'state', coalesce(state_row.state, '{}'::jsonb),
-    'updatedAt', state_row.updated_at
-  )
-  from public.restaurant_members as member_row
-  join public.restaurants as restaurant_row
-    on restaurant_row.id = member_row.restaurant_id
-  left join public.restaurant_states as state_row
-    on state_row.restaurant_id = member_row.restaurant_id
-  where member_row.user_id = (select auth.uid())
-    and member_row.is_active
-    and (
-      p_restaurant_id is null
-      or member_row.restaurant_id = p_restaurant_id
-    )
-  order by member_row.updated_at desc
-  limit 1;
-$$;
+  <main class="auth-shell hidden" id="auth-shell">
+    <section class="auth-brand">
+      <div class="brand-lockup"><img class="brand-mark large" src="../assets/servora-app-icon.png" alt=""><span>Servora</span></div>
+      <div>
+        <p class="eyebrow">Servora Verwaltung</p>
+        <h1>Restaurantbetrieb</h1>
+        <p>Tische, Reservierungen, Bestellungen und Team zentral verwalten. Änderungen werden mit der Servora-App synchronisiert.</p>
+      </div>
+      <div class="auth-points" aria-label="Funktionen">
+        <span>App und Web synchron</span>
+        <span>Berechtigungen nach Rolle</span>
+        <span>Mobil und Desktop</span>
+      </div>
+    </section>
 
-create or replace function public.web_initialize_restaurant_state(
-  p_restaurant_id uuid,
-  p_state jsonb
-)
-returns jsonb
-language plpgsql
-security definer
-set search_path = 'pg_catalog'
-as $$
-declare
-  member_role text;
-  saved public.restaurant_states;
-begin
-  select member.role
-  into member_role
-  from public.restaurant_members as member
-  where member.restaurant_id = p_restaurant_id
-    and member.user_id = auth.uid()
-    and member.is_active
-  limit 1;
+    <section class="auth-panel">
+      <div class="auth-heading">
+        <p class="eyebrow">Servora Web</p>
+        <h2 id="auth-title">Anmelden</h2>
+        <p id="auth-subtitle">Mit Restaurantkennung und persönlichem Zugang.</p>
+      </div>
 
-  if member_role <> 'restaurant_manager' then
-    raise exception 'Access denied';
-  end if;
-  if jsonb_typeof(p_state) <> 'object'
-     or pg_column_size(p_state) > 5242880 then
-    raise exception 'Invalid restaurant state';
-  end if;
+      <div class="segmented" role="tablist" aria-label="Zugang">
+        <button class="selected" id="login-tab" role="tab" aria-selected="true" type="button">Anmelden</button>
+        <button id="register-tab" role="tab" aria-selected="false" type="button">Neu anlegen</button>
+      </div>
 
-  insert into public.restaurant_states (restaurant_id, state)
-  values (p_restaurant_id, p_state)
-  on conflict (restaurant_id)
-  do nothing;
+      <form id="login-form">
+        <label class="field">
+          <span>Restaurantkennung</span>
+          <input id="login-code" autocomplete="organization" placeholder="z. B. SERV-ABCD" required>
+        </label>
+        <label class="field">
+          <span>Name</span>
+          <input id="login-username" autocomplete="username" required>
+        </label>
+        <label class="field">
+          <span>Passwort</span>
+          <input id="login-password" type="password" autocomplete="current-password" minlength="6" required>
+        </label>
+        <p class="field-hint">Geräte- und Druckerzugänge werden ausschließlich in der Servora-App verwendet.</p>
+        <p class="form-error hidden" id="login-error" role="alert"></p>
+        <button class="primary full" id="login-submit" type="submit">Anmelden</button>
+      </form>
 
-  select *
-  into saved
-  from public.restaurant_states
-  where restaurant_id = p_restaurant_id;
+      <form class="hidden" id="register-form">
+        <div class="field-grid">
+          <label class="field">
+            <span>Restaurantname</span>
+            <input id="register-name" autocomplete="organization" required>
+          </label>
+          <label class="field">
+            <span>Betriebsart</span>
+            <select id="register-type">
+              <option>Restaurant</option>
+              <option>Café</option>
+              <option>Bar</option>
+              <option>Eisdiele</option>
+              <option>Foodtruck</option>
+              <option>Hotelrestaurant</option>
+              <option>Eventgastronomie</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span>Name der Restaurantleitung</span>
+          <input id="register-username" autocomplete="username" minlength="2" required>
+        </label>
+        <p class="field-hint">Dieser vollständige Name ist zugleich der eindeutige Anmeldename. Groß- und Kleinschreibung werden nicht unterschieden.</p>
+        <label class="field">
+          <span>Passwort</span>
+          <input id="register-password" type="password" autocomplete="new-password" minlength="8" required>
+        </label>
+        <label class="check">
+          <input id="register-terms" type="checkbox" required>
+          <span>Ich bestätige, dass ich den Betrieb anlegen darf und akzeptiere die Testbedingungen.</span>
+        </label>
+        <p class="form-error hidden" id="register-error" role="alert"></p>
+        <button class="primary full" id="register-submit" type="submit">Restaurant sicher erstellen</button>
+      </form>
+    </section>
+  </main>
 
-  return jsonb_build_object(
-    'state', saved.state,
-    'updatedAt', saved.updated_at
-  );
-end;
-$$;
+  <div class="app-shell hidden" id="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img class="brand-mark" src="../assets/servora-app-icon.png" alt="">
+        <div><strong>Servora</strong><small>Betriebsverwaltung</small></div>
+      </div>
+      <nav id="desktop-navigation" aria-label="Hauptnavigation"></nav>
+      <div class="sidebar-user">
+        <strong id="sidebar-user-name">–</strong>
+        <span id="sidebar-user-role">–</span>
+        <button class="quiet" id="logout-button" type="button">Abmelden</button>
+      </div>
+    </aside>
 
-create or replace function public.web_patch_restaurant_state(
-  p_restaurant_id uuid,
-  p_patch jsonb,
-  p_expected_updated_at timestamptz default null
-)
-returns jsonb
-language plpgsql
-security definer
-set search_path = 'pg_catalog'
-as $$
-declare
-  member_role text;
-  requested_keys text[];
-  allowed_keys text[];
-  existing public.restaurant_states;
-  saved public.restaurant_states;
-begin
-  select member.role
-  into member_role
-  from public.restaurant_members as member
-  where member.restaurant_id = p_restaurant_id
-    and member.user_id = auth.uid()
-    and member.is_active
-  limit 1;
+    <main class="workspace">
+      <header class="workspace-header">
+        <div>
+          <p class="eyebrow" id="restaurant-code">–</p>
+          <h1 id="page-title">Start</h1>
+        </div>
+        <div class="header-actions">
+          <span class="sync-state" id="sync-state"><i></i><span>Aktuell</span></span>
+          <button class="icon-button" id="refresh-button" type="button" aria-label="Aktualisieren" title="Aktualisieren">↻</button>
+          <button class="restaurant-switch" id="restaurant-button" type="button">
+            <span id="restaurant-name">Restaurant</span>
+            <small id="restaurant-role">–</small>
+          </button>
+        </div>
+      </header>
+      <section class="view" id="view" aria-live="polite"></section>
+    </main>
 
-  if member_role is null then
-    raise exception 'Access denied';
-  end if;
-  if jsonb_typeof(p_patch) <> 'object'
-     or p_patch = '{}'::jsonb
-     or pg_column_size(p_patch) > 2097152 then
-    raise exception 'Invalid state patch';
-  end if;
+    <nav class="mobile-navigation" id="mobile-navigation" aria-label="Mobile Hauptnavigation"></nav>
+  </div>
 
-  requested_keys := array(
-    select jsonb_object_keys(p_patch)
-  );
+  <dialog id="modal">
+    <div class="modal-shell" id="modal-shell">
+      <header>
+        <div>
+          <p class="eyebrow" id="modal-eyebrow">Servora</p>
+          <h2 id="modal-title">Bearbeiten</h2>
+        </div>
+        <button class="icon-button" type="button" data-modal-action="close" aria-label="Schließen" title="Schließen">×</button>
+      </header>
+      <div class="modal-body" id="modal-body"></div>
+      <footer class="modal-footer" id="modal-footer"></footer>
+    </div>
+  </dialog>
 
-  if member_role = 'restaurant_manager' then
-    allowed_keys := array[
-      'restaurantName', 'tables', 'areas', 'hiddenAreas', 'products',
-      'categories', 'categoryColors', 'categoryParents',
-      'stations', 'team', 'tickets', 'reservations',
-      'guestReviews', 'tableOrders', 'tableSaleItems', 'tableRevenue',
-      'activeShiftStart', 'activeBreakStart', 'accumulatedBreak',
-      'shiftRecords', 'scheduledShifts', 'shiftRequests', 'absenceRequests', 'paymentMethods',
-      'paymentRecords', 'counterSales', 'vouchers', 'voucherConfiguration',
-      'printers', 'printJobs', 'onlineBookingConfiguration',
-      'servoraPlusEntitlement', 'fiscalConfiguration', 'fiscalReceipts',
-      'cashDaySessions', 'fiscalAuditEvents'
-    ];
-  elsif member_role in ('management', 'service') then
-    allowed_keys := array[
-      'tables', 'tickets', 'reservations', 'tableOrders', 'tableSaleItems',
-      'tableRevenue', 'activeShiftStart', 'activeBreakStart',
-      'accumulatedBreak', 'shiftRecords', 'shiftRequests',
-      'absenceRequests', 'paymentRecords', 'counterSales', 'vouchers',
-      'printJobs'
-    ];
-  elsif member_role in ('kitchen', 'bar') then
-    allowed_keys := array[
-      'tickets', 'activeShiftStart', 'activeBreakStart',
-      'accumulatedBreak', 'shiftRecords', 'shiftRequests',
-      'absenceRequests', 'printJobs'
-    ];
-  else
-    raise exception 'Role is not supported in the web dashboard';
-  end if;
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
 
-  if exists (
-    select 1
-    from unnest(requested_keys) as requested(key)
-    where not (requested.key = any(allowed_keys))
-  ) then
-    raise exception 'Patch contains fields not allowed for this role';
-  end if;
+  <template id="empty-template">
+    <div class="empty-state">
+      <img class="empty-mark" src="../assets/servora-app-icon.png" alt="">
+      <h2></h2>
+      <p></p>
+    </div>
+  </template>
 
-  select *
-  into existing
-  from public.restaurant_states
-  where restaurant_id = p_restaurant_id
-  for update;
-
-  if existing.restaurant_id is null then
-    raise exception 'Restaurant state missing';
-  end if;
-  if p_expected_updated_at is not null
-     and existing.updated_at <> p_expected_updated_at then
-    raise exception 'STATE_CONFLICT';
-  end if;
-
-  update public.restaurant_states
-  set state = existing.state || p_patch
-  where restaurant_id = p_restaurant_id
-  returning * into saved;
-
-  return jsonb_build_object(
-    'state', saved.state,
-    'updatedAt', saved.updated_at
-  );
-end;
-$$;
-
-revoke all on function public.web_get_restaurant_workspace(uuid)
-  from public, anon;
-grant execute on function public.web_get_restaurant_workspace(uuid)
-  to authenticated;
-
-revoke all on function public.web_initialize_restaurant_state(uuid, jsonb)
-  from public, anon;
-grant execute on function public.web_initialize_restaurant_state(uuid, jsonb)
-  to authenticated;
-
-revoke all on function public.web_patch_restaurant_state(uuid, jsonb, timestamptz)
-  from public, anon;
-grant execute on function public.web_patch_restaurant_state(uuid, jsonb, timestamptz)
-  to authenticated;
-
-commit;
+  <script type="module" src="./app.js?v=4"></script>
+</body>
+</html>
