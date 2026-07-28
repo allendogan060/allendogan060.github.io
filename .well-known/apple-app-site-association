@@ -11,7 +11,7 @@
             "?": {
               "r": "*"
             },
-            "comment": "Öffnet öffentliche Seriva-Reservierungslinks in der installierten App."
+            "comment": "Öffnet öffentliche Taviko-Reservierungslinks in der installierten App."
           }
         ]
       }
