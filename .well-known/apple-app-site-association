@@ -1,0 +1,25 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "LHU8U2LFDP.com.oezguer.Restaurant"
+        ],
+        "components": [
+          {
+            "/": "/*",
+            "?": {
+              "r": "*"
+            },
+            "comment": "Öffnet öffentliche Seriva-Reservierungslinks in der installierten App."
+          }
+        ]
+      }
+    ]
+  },
+  "appclips": {
+    "apps": [
+      "LHU8U2LFDP.com.oezguer.Restaurant.Clip"
+    ]
+  }
+}
