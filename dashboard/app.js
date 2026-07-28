@@ -3,7 +3,6 @@ const SUPABASE_KEY = "sb_publishable_VeeQLARNn-sULZ4snvp3HA_Hd78H5RN";
 const DEVELOPMENT_MODE = true;
 const DEVELOPMENT_PIN_HASH =
   "5f20b9b81da6a3163f1cc96b603868330378255157dae99d8a6d7cc5fa3d6a19";
-const ACCESS_SESSION_KEY = "servora-development-access";
 const AUTH_STORAGE_KEY = "servora-web-session";
 const LAST_RESTAURANT_KEY = "servora-web-restaurant";
 const SWIFT_REFERENCE_SECONDS = 978307200;
@@ -42,6 +41,28 @@ const stateRoleToDatabaseRole = {
   Küche: "kitchen",
   Bar: "bar"
 };
+
+const teamPermissions = [
+  ["closeOwnShift", "Eigene Schicht schließen", "Die eigene laufende Schicht beenden."],
+  ["manageCashDay", "Tagesbetrieb verwalten", "Tage öffnen und Tagesabschlüsse durchführen."],
+  ["viewStatistics", "Statistiken ansehen", "Umsatz- und Betriebsstatistiken öffnen."],
+  ["manageProducts", "Produkte verwalten", "Produkte, Kategorien und Preise bearbeiten."],
+  ["manageReservations", "Reservierungen verwalten", "Reservierungen anlegen und bearbeiten."],
+  ["manageGuests", "Gästeregister verwalten", "Gastprofile ansehen und bearbeiten."],
+  ["manageTables", "Tische und Bereiche verwalten", "Tischplan und Bereiche bearbeiten."],
+  ["manageTeam", "Team und Schichtplan verwalten", "Zugänge und geplante Schichten bearbeiten."],
+  ["manageStations", "Stationen und Drucker verwalten", "Ausgabewege und Geräte konfigurieren."],
+  ["managePayments", "Zahlungen und Stornos bearbeiten", "Zahlungen korrigieren oder stornieren."],
+  ["viewReports", "Berichte ansehen", "Abschlüsse und exportierbare Berichte öffnen."]
+];
+
+function defaultPermissions(role) {
+  if (role === "Restaurantleitung") return teamPermissions.map(([id]) => id);
+  if (role === "Service") {
+    return ["closeOwnShift", "manageReservations", "manageGuests", "manageTables"];
+  }
+  return ["closeOwnShift"];
+}
 
 const routes = [
   { id: "overview", title: "Start", symbol: "⌂", roles: ["restaurant_manager", "management", "service", "kitchen", "bar"] },
@@ -113,9 +134,9 @@ function inferKitchenOperatingMode(stations) {
 }
 
 function kitchenOperatingModeTitle(mode) {
-  if (mode === "printedKitchen") return "Küchenbon-Ausgabe";
+  if (mode === "printedKitchen") return "Nur Bondruck";
   if (mode === "hybrid") return "Kombiniert";
-  return "Digitale Küche";
+  return "Nur digitale Stationen";
 }
 
 function operatingModeSupports(mode, stationMode) {
@@ -131,7 +152,7 @@ function productRoutingIssue(product) {
   if (!station) return "Keine Station zugewiesen";
   if (station.isActive === false) return `Station „${station.name}“ ist deaktiviert`;
   if (!operatingModeSupports(app.data.kitchenOperatingMode, station.defaultMode)) {
-    return "Station passt nicht zur Betriebsart";
+    return "Station passt nicht zur Ausgabeart";
   }
   if (station.defaultMode === "print") {
     const printer = app.data.printers.find((item) => item.id === station.printerID);
@@ -326,6 +347,7 @@ function defaultState(session) {
         username: session.username
       }
     ],
+    devices: [],
     currentMemberID: ownerID,
     tickets: [],
     reservations: [],
@@ -470,6 +492,7 @@ function normalizeState(state = {}) {
       inferKitchenOperatingMode(state.stations || []),
     stations: state.stations || [],
     team: state.team || [],
+    devices: state.devices || [],
     currentMemberID: state.currentMemberID || null,
     tickets: state.tickets || [],
     reservations: state.reservations || [],
@@ -1072,21 +1095,45 @@ async function deleteCategory(name) {
 function renderTeam() {
   $("view").innerHTML = `
     <div class="page-tools">
-      <div><h2>Team & Zugänge</h2><p>Mitarbeiter können sich anschließend in App und Web anmelden.</p></div>
-      <button class="primary" type="button" data-action="add-member">+ Mitarbeiter</button>
+      <div><h2>Team & Geräte</h2><p>Persönliche Zugänge und fest zugewiesene Betriebsgeräte getrennt verwalten.</p></div>
+      <div class="tool-actions">
+        <button class="secondary" type="button" data-action="add-device">Gerät hinzufügen</button>
+        <button class="primary" type="button" data-action="add-member">Mitarbeiter hinzufügen</button>
+      </div>
     </div>
     <section class="section table-section">
+      <div class="section-heading"><div><p class="eyebrow">Persönliche Zugänge</p><h3>Mitarbeiter</h3></div></div>
       <table class="data-table">
-        <thead><tr><th>Name und Anmeldung</th><th>Rolle</th><th>Telefon</th></tr></thead>
+        <thead><tr><th>Name und Anmeldung</th><th>Rolle</th><th>Telefon</th><th></th></tr></thead>
         <tbody>
           ${app.data.team.map((member) => `
             <tr>
               <td><strong>${escapeHTML(member.name)}</strong></td>
               <td>${statusBadge(member.role)}</td>
               <td>${escapeHTML(member.phone || "–")}</td>
+              <td><div class="row-actions"><button class="row-button" type="button" data-member-id="${member.id}">Bearbeiten</button></div></td>
             </tr>`).join("")}
         </tbody>
       </table>
+    </section>
+    <section class="section table-section">
+      <div class="section-heading"><div><p class="eyebrow">Festes Gerät</p><h3>Geräte</h3><p>Der Gerätename ist zugleich der eindeutige Anmeldename.</p></div></div>
+      ${app.data.devices.length ? `
+        <table class="data-table">
+          <thead><tr><th>Name und Anmeldung</th><th>Typ</th><th>Station</th><th></th></tr></thead>
+          <tbody>
+            ${app.data.devices.map((device) => {
+              const station = app.data.stations.find((item) => item.id === device.stationID);
+              return `<tr>
+                <td><strong>${escapeHTML(device.name)}</strong><br><span class="muted">${escapeHTML(device.loginName || device.name)}</span></td>
+                <td>${statusBadge(device.kind === "Küchenanzeige" ? "Digitales Stationsdisplay" : "Kasse")}</td>
+                <td>${escapeHTML(station?.name || "–")}</td>
+                <td><button class="row-button" type="button" data-device-id="${device.id}">Bearbeiten</button></td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+      ` : `<div class="empty-inline"><strong>Noch keine Gerätezugänge</strong><span>Lege eine Kasse oder ein digitales Stationsdisplay an.</span></div>`}
     </section>
   `;
 }
@@ -1293,21 +1340,24 @@ async function renderReviews() {
 
 function renderStations() {
   $("view").innerHTML = `
-    <div class="page-tools"><div><h2>Stationen</h2><p>Digitale Küche und gedruckte Küchenbons zentral steuern.</p></div><button class="primary" type="button" data-action="add-station">+ Station</button></div>
+    <div class="page-tools"><div><h2>Stationen & Ausgabe</h2><p>Lege fest, ob Aufträge digital, gedruckt oder über beide Wege ausgegeben werden.</p></div><button class="primary" type="button" data-action="add-station">Station hinzufügen</button></div>
     <section class="section">
-      <header class="section-header"><div><h2>Betriebsart</h2><p>Legt fest, welche Stationsarten verwendet werden.</p></div></header>
-      <div class="section-body inline-settings">
-        <select id="kitchen-operating-mode">
-          <option value="digitalKitchen" ${app.data.kitchenOperatingMode === "digitalKitchen" ? "selected" : ""}>Digitale Küche</option>
-          <option value="printedKitchen" ${app.data.kitchenOperatingMode === "printedKitchen" ? "selected" : ""}>Küchenbon-Ausgabe</option>
+      <header class="section-header"><div><h2>Auftragsausgabe</h2><p>Diese Einstellung gilt für Küche, Bar, Getränke und weitere Stationen.</p></div></header>
+      <div class="section-body setting-choice">
+        <div>
+          <select id="kitchen-operating-mode" aria-label="Ausgabeart">
+          <option value="digitalKitchen" ${app.data.kitchenOperatingMode === "digitalKitchen" ? "selected" : ""}>Nur digitale Stationen</option>
+          <option value="printedKitchen" ${app.data.kitchenOperatingMode === "printedKitchen" ? "selected" : ""}>Nur Bondruck</option>
           <option value="hybrid" ${app.data.kitchenOperatingMode === "hybrid" ? "selected" : ""}>Kombiniert</option>
-        </select>
+          </select>
+          <p>Digitale Stationen zeigen Aufträge auf einem Display. Beim Bondruck werden sie an einen zugewiesenen Drucker übergeben.</p>
+        </div>
         <button class="secondary" type="button" data-action="save-operating-mode">Übernehmen</button>
       </div>
     </section>
     <section class="section table-section">
-      ${app.data.stations.length ? `<table class="data-table"><thead><tr><th>Name</th><th>Übertragung</th><th>Warnzeit</th><th>Status</th><th></th></tr></thead><tbody>
-        ${app.data.stations.map((station) => `<tr class="${station.isActive === false ? "is-disabled" : ""}"><td><strong>${escapeHTML(station.name)}</strong></td><td>${station.defaultMode === "digital" ? "Digital" : "Druckausgabe"}</td><td>${Number(station.warningMinutes || 12)} Min.</td><td>${station.isActive ? `<span class="badge green">Aktiv</span>` : `<span class="badge red">Deaktiviert</span>`}</td><td><div class="row-actions"><button class="row-button" type="button" data-station-id="${station.id}">Bearbeiten</button></div></td></tr>`).join("")}
+      ${app.data.stations.length ? `<table class="data-table"><thead><tr><th>Name</th><th>Ausgabeweg</th><th>Warnzeit</th><th>Status</th><th></th></tr></thead><tbody>
+        ${app.data.stations.map((station) => `<tr class="${station.isActive === false ? "is-disabled" : ""}"><td><strong>${escapeHTML(station.name)}</strong></td><td>${station.defaultMode === "digital" ? "Digitales Stationsdisplay" : "Bondruck"}</td><td>${Number(station.warningMinutes || 12)} Min.</td><td>${station.isActive ? `<span class="badge green">Aktiv</span>` : `<span class="badge red">Deaktiviert</span>`}</td><td><div class="row-actions"><button class="row-button" type="button" data-station-id="${station.id}">Bearbeiten</button></div></td></tr>`).join("")}
       </tbody></table>` : emptyHTML("Noch keine Station", "Lege Küche, Bar oder eine eigene Station an.")}
     </section>
   `;
@@ -1320,7 +1370,7 @@ async function saveKitchenOperatingMode() {
     (station) => station.isActive !== false && !operatingModeSupports(mode, station.defaultMode)
   );
   if (incompatible) {
-    toast("Betriebsart nicht geändert", "Deaktiviere oder ändere zuerst unpassende Stationen.", "error");
+    toast("Ausgabeart nicht geändert", "Deaktiviere oder ändere zuerst unpassende Stationen.", "error");
     return;
   }
   await savePatch({ kitchenOperatingMode: mode }, `${kitchenOperatingModeTitle(mode)} ist aktiv.`);
@@ -1392,10 +1442,10 @@ function renderSettings() {
         </div>
       </section>
       <section class="section">
-        <header class="section-header"><h2>Geräte & Drucker</h2></header>
+        <header class="section-header"><h2>Geräte, Stationen & Drucker</h2></header>
         <div class="section-body">
-          <p>Gerätezugänge werden absichtlich nicht im Browser angemeldet.</p>
-          <p class="field-hint">Digitale Küchenstationen und Drucker verwenden die Servora-App im geschützten Vollbildmodus.</p>
+          <p>Gerätezugänge werden im Team-Bereich verwaltet und ausschließlich in der Servora-App angemeldet.</p>
+          <p class="field-hint">Kassen öffnen Tische und Theke. Digitale Stationsdisplays zeigen nur die Aufträge ihrer zugewiesenen Station. Klassische Bondrucker besitzen keinen Mitarbeiterzugang.</p>
         </div>
       </section>
     </div>
@@ -1410,13 +1460,26 @@ async function saveBusinessSettings(event) {
   event.preventDefault();
   const form = event.currentTarget;
   if (!form.reportValidity()) return;
+  const email = $("business-email").value.trim();
+  const phone = $("business-phone").value.trim();
+  const phoneDigits = phone.replace(/\D/g, "");
+  if (email && !$("business-email").checkValidity()) {
+    toast("E-Mail prüfen", "Bitte gib eine vollständige E-Mail-Adresse ein.", "error");
+    $("business-email").focus();
+    return;
+  }
+  if (phone && (!/^[+0-9 ()/-]+$/.test(phone) || phoneDigits.length < 6 || phoneDigits.length > 18)) {
+    toast("Telefonnummer prüfen", "Bitte gib eine gültige Telefonnummer ein.", "error");
+    $("business-phone").focus();
+    return;
+  }
   const configuration = structuredClone(
     app.data.onlineBookingConfiguration ||
       defaultOnlineBookingConfiguration(app.workspace)
   );
   configuration.restaurant.address = $("business-address").value.trim();
-  configuration.restaurant.phone = $("business-phone").value.trim();
-  configuration.restaurant.email = $("business-email").value.trim();
+  configuration.restaurant.phone = phone;
+  configuration.restaurant.email = email;
   configuration.restaurant.openingHoursText =
     $("business-opening-text").value.trim();
   configuration.restaurant.settings.bookingEnabled =
@@ -2053,19 +2116,42 @@ async function deleteProduct(productID) {
   if (await savePatch({ products: app.data.products.filter((item) => item.id !== productID) }, "Produkt wurde gelöscht.")) closeModal();
 }
 
-function openMemberEditor() {
+function permissionEditorHTML(member, role) {
+  const selected = new Set(member?.permissions || defaultPermissions(role));
+  const manager = role === "Restaurantleitung";
+  return `
+    <div class="permission-list" id="member-permissions">
+      ${teamPermissions.map(([id, title, explanation]) => `
+        <label class="permission-row">
+          <span><strong>${escapeHTML(title)}</strong><small>${escapeHTML(explanation)}</small></span>
+          <span class="switch">
+            <input type="checkbox" value="${id}" ${manager || selected.has(id) ? "checked" : ""} ${manager ? "disabled" : ""}>
+            <span aria-hidden="true"></span>
+          </span>
+        </label>`).join("")}
+    </div>`;
+}
+
+function openMemberEditor(memberID = null) {
+  const member = app.data.team.find((item) => item.id === memberID);
+  const role = member?.role || "Service";
   openModal({
     eyebrow: "Geschützter Zugang",
-    title: "Mitarbeiter anlegen",
+    title: member ? "Mitarbeiter bearbeiten" : "Mitarbeiter anlegen",
     body: `
-      <form id="member-form">
-        <label class="field"><span>Name</span><input id="member-name" required></label>
-        <label class="field"><span>Rolle</span><select id="member-role"><option>Service</option><option>Management</option><option>Küche</option><option>Bar</option></select></label>
-        <label class="field"><span>Startpasswort</span><input id="member-password" type="password" minlength="8" autocomplete="new-password" required></label>
-        <label class="field"><span>Telefon</span><input id="member-phone" type="tel"></label>
+      <form id="member-form" data-id="${member?.id || ""}" data-login-name="${escapeHTML(member?.username || member?.name || "")}">
+        <label class="field"><span>Name</span><input id="member-name" value="${escapeHTML(member?.name || "")}" required></label>
+        <label class="field"><span>Rolle</span><select id="member-role"><option ${role === "Restaurantleitung" ? "selected" : ""}>Restaurantleitung</option><option ${role === "Service" ? "selected" : ""}>Service</option><option ${role === "Management" ? "selected" : ""}>Management</option><option ${role === "Küche" ? "selected" : ""}>Küche</option><option ${role === "Bar" ? "selected" : ""}>Bar</option></select></label>
+        <label class="field"><span>${member ? "Neues Passwort (optional)" : "Startpasswort"}</span><input id="member-password" type="password" minlength="8" autocomplete="new-password" ${member ? "" : "required"}></label>
+        <label class="field"><span>Telefon</span><input id="member-phone" type="tel" value="${escapeHTML(member?.phone || "")}"></label>
         <p class="field-hint">Der Name ist gleichzeitig der eindeutige Anmeldename. Groß- und Kleinschreibung werden nicht unterschieden. Das Passwort wird ausschließlich als sicherer Hash gespeichert.</p>
+        <div id="member-permission-editor">${permissionEditorHTML(member, role)}</div>
       </form>`,
-    footer: `<button class="secondary" type="button" data-modal-action="close">Abbrechen</button><button class="primary" type="button" data-modal-action="save-member">Zugang erstellen</button>`
+    footer: `${member ? `<button class="danger" type="button" data-modal-action="delete-member" data-id="${member.id}">Mitarbeiter löschen</button>` : ""}<button class="secondary" type="button" data-modal-action="close">Abbrechen</button><button class="primary" type="button" data-modal-action="save-member">${member ? "Speichern" : "Zugang erstellen"}</button>`
+  });
+  $("member-role")?.addEventListener("change", () => {
+    $("member-permission-editor").innerHTML =
+      permissionEditorHTML(null, $("member-role").value);
   });
 }
 
@@ -2123,33 +2209,205 @@ async function saveScheduledShift() {
 async function saveMember() {
   const form = $("member-form");
   if (!form?.reportValidity()) return;
+  const memberID = form.dataset.id || null;
+  const previousLoginName = form.dataset.loginName;
   const roleTitle = $("member-role").value;
   const member = {
-    id: uuid(),
+    id: memberID || uuid(),
     name: $("member-name").value.trim(),
     role: roleTitle,
     phone: $("member-phone").value.trim(),
-    username: $("member-name").value.trim()
+    username: $("member-name").value.trim(),
+    permissions: roleTitle === "Restaurantleitung"
+      ? defaultPermissions(roleTitle)
+      : [...form.querySelectorAll("#member-permissions input:checked")].map((input) => input.value)
   };
   if (app.data.team.some((item) =>
+    item.id !== memberID &&
     String(item.name).localeCompare(member.name, "de", { sensitivity: "base" }) === 0
   ) || app.data.stations.some((item) =>
     String(item.accessUsername || item.name).localeCompare(member.name, "de", { sensitivity: "base" }) === 0
+  ) || app.data.devices.some((item) =>
+    String(item.loginName || item.name).localeCompare(member.name, "de", { sensitivity: "base" }) === 0
   )) {
     toast("Name bereits vergeben", "Jeder Anmeldename muss im Restaurant eindeutig sein.", "error");
     return;
   }
   try {
-    await rpc("upsert_restaurant_credential", {
-      target_restaurant_id: app.workspace.restaurantId,
-      member_username: member.username,
-      member_password: $("member-password").value,
-      member_display_name: member.name,
-      member_role: stateRoleToDatabaseRole[roleTitle]
-    });
-    if (await savePatch({ team: [...app.data.team, member] }, "Mitarbeiterzugang wurde erstellt.")) closeModal();
+    const password = $("member-password").value;
+    if (memberID) {
+      await rpc("update_restaurant_credential_identity", {
+        target_restaurant_id: app.workspace.restaurantId,
+        previous_username: previousLoginName,
+        member_name: member.name,
+        member_password: password,
+        member_role: stateRoleToDatabaseRole[roleTitle]
+      });
+    } else {
+      await rpc("upsert_restaurant_credential", {
+        target_restaurant_id: app.workspace.restaurantId,
+        member_username: member.username,
+        member_password: password,
+        member_display_name: member.name,
+        member_role: stateRoleToDatabaseRole[roleTitle]
+      });
+    }
+    const team = memberID
+      ? app.data.team.map((item) => item.id === memberID ? member : item)
+      : [...app.data.team, member];
+    if (await savePatch({ team }, memberID ? "Mitarbeiter wurde aktualisiert." : "Mitarbeiterzugang wurde erstellt.")) closeModal();
   } catch (error) {
-    toast("Zugang nicht erstellt", friendlyError(error), "error");
+    toast("Zugang nicht gespeichert", friendlyError(error), "error");
+  }
+}
+
+async function deleteMember(memberID) {
+  const member = app.data.team.find((item) => item.id === memberID);
+  if (!member) return;
+  const managerCount = app.data.team.filter((item) => item.role === "Restaurantleitung").length;
+  if (member.role === "Restaurantleitung" && managerCount <= 1) {
+    toast("Nicht möglich", "Die letzte Restaurantleitung kann nicht gelöscht werden.", "error");
+    return;
+  }
+  if (String(member.username).localeCompare(String(app.workspace.username), "de", { sensitivity: "base" }) === 0) {
+    toast("Nicht möglich", "Der aktuell angemeldete Zugang kann hier nicht gelöscht werden.", "error");
+    return;
+  }
+  if (!window.confirm(`Mitarbeiterzugang „${member.name}“ endgültig löschen?`)) return;
+  try {
+    await rpc("delete_restaurant_credential", {
+      target_restaurant_id: app.workspace.restaurantId,
+      member_username: member.username || member.name
+    });
+    if (await savePatch(
+      { team: app.data.team.filter((item) => item.id !== memberID) },
+      "Mitarbeiterzugang wurde gelöscht."
+    )) closeModal();
+  } catch (error) {
+    toast("Mitarbeiter nicht gelöscht", friendlyError(error), "error");
+  }
+}
+
+function openDeviceEditor(deviceID = null) {
+  const device = app.data.devices.find((item) => item.id === deviceID);
+  const kind = device?.kind || "Bonier-Tablet";
+  const digitalStations = app.data.stations.filter(
+    (station) => station.defaultMode === "digital" && station.isActive !== false
+  );
+  openModal({
+    eyebrow: "Geschützter Gerätezugang",
+    title: device ? "Gerät bearbeiten" : "Gerät anlegen",
+    body: `
+      <form id="device-form" data-id="${device?.id || ""}" data-login-name="${escapeHTML(device?.loginName || device?.name || "")}">
+        <label class="field"><span>Gerätename</span><input id="device-name" value="${escapeHTML(device?.name || "")}" required></label>
+        <label class="field"><span>Gerätetyp</span>
+          <select id="device-kind">
+            <option value="Bonier-Tablet" ${kind === "Bonier-Tablet" ? "selected" : ""}>Kasse</option>
+            <option value="Küchenanzeige" ${kind === "Küchenanzeige" ? "selected" : ""}>Digitales Stationsdisplay</option>
+          </select>
+        </label>
+        <label class="field" id="device-station-field"><span>Digitale Station</span>
+          <select id="device-station">
+            <option value="">Bitte auswählen</option>
+            ${digitalStations.map((station) => `<option value="${station.id}" ${device?.stationID === station.id ? "selected" : ""}>${escapeHTML(station.name)}</option>`).join("")}
+          </select>
+        </label>
+        <label class="field"><span>${device ? "Neues Passwort (optional)" : "Gerätepasswort"}</span><input id="device-password" type="password" minlength="6" autocomplete="new-password" ${device ? "" : "required"}></label>
+        <div class="notice-card">
+          <strong>Anmeldung am Gerät</strong>
+          <p>Restaurantkennung, Gerätename und Gerätepasswort öffnen direkt die passende Oberfläche. Der Anmeldename ändert sich automatisch mit dem Gerätenamen.</p>
+        </div>
+      </form>`,
+    footer: `
+      ${device ? `<button class="danger" type="button" data-modal-action="delete-device" data-id="${device.id}">Gerät löschen</button>` : ""}
+      <button class="secondary" type="button" data-modal-action="close">Abbrechen</button>
+      <button class="primary" type="button" data-modal-action="save-device">Speichern</button>`
+  });
+  updateDeviceStationVisibility();
+  $("device-kind")?.addEventListener("change", updateDeviceStationVisibility);
+}
+
+function updateDeviceStationVisibility() {
+  const isKitchen = $("device-kind")?.value === "Küchenanzeige";
+  $("device-station-field")?.classList.toggle("hidden", !isKitchen);
+  if ($("device-station")) $("device-station").required = isKitchen;
+}
+
+async function saveDevice() {
+  const form = $("device-form");
+  if (!form?.reportValidity()) return;
+  const deviceID = form.dataset.id || null;
+  const previousLoginName = form.dataset.loginName;
+  const name = $("device-name").value.trim();
+  const kind = $("device-kind").value;
+  const stationID = kind === "Küchenanzeige" ? $("device-station").value : null;
+  const password = $("device-password").value;
+  const duplicate =
+    app.data.team.some((item) =>
+      String(item.name).localeCompare(name, "de", { sensitivity: "base" }) === 0
+    ) ||
+    app.data.stations.some((item) =>
+      String(item.accessUsername || item.name).localeCompare(name, "de", { sensitivity: "base" }) === 0
+    ) ||
+    app.data.devices.some((item) =>
+      item.id !== deviceID &&
+      String(item.loginName || item.name).localeCompare(name, "de", { sensitivity: "base" }) === 0
+    );
+  if (duplicate) {
+    toast("Name bereits vergeben", "Mitarbeiter, Stationen und Geräte benötigen eindeutige Anmeldenamen.", "error");
+    return;
+  }
+
+  const devices = structuredClone(app.data.devices);
+  const existing = devices.find((item) => item.id === deviceID);
+  const device = existing || {
+    id: uuid(),
+    createdAt: swiftDate()
+  };
+  device.name = name;
+  device.loginName = name;
+  device.kind = kind;
+  device.stationID = stationID || null;
+
+  try {
+    if (existing) {
+      await rpc("update_restaurant_credential_identity", {
+        target_restaurant_id: app.workspace.restaurantId,
+        previous_username: previousLoginName,
+        member_name: name,
+        member_password: password,
+        member_role: kind === "Küchenanzeige" ? "kitchen" : "service"
+      });
+    } else {
+      await rpc("upsert_restaurant_credential", {
+        target_restaurant_id: app.workspace.restaurantId,
+        member_username: name,
+        member_password: password,
+        member_display_name: `Gerät · ${name}`,
+        member_role: kind === "Küchenanzeige" ? "kitchen" : "service"
+      });
+      devices.push(device);
+    }
+    if (await savePatch({ devices }, "Gerätezugang wurde gespeichert.")) closeModal();
+  } catch (error) {
+    toast("Gerät nicht gespeichert", friendlyError(error), "error");
+  }
+}
+
+async function deleteDevice(deviceID) {
+  const device = app.data.devices.find((item) => item.id === deviceID);
+  if (!device || !window.confirm(`Gerätezugang „${device.name}“ endgültig löschen?`)) return;
+  try {
+    await rpc("delete_restaurant_credential", {
+      target_restaurant_id: app.workspace.restaurantId,
+      member_username: device.loginName || device.name
+    });
+    if (await savePatch(
+      { devices: app.data.devices.filter((item) => item.id !== deviceID) },
+      "Gerätezugang wurde gelöscht."
+    )) closeModal();
+  } catch (error) {
+    toast("Gerät nicht gelöscht", friendlyError(error), "error");
   }
 }
 
@@ -2209,7 +2467,7 @@ function openStationEditor(stationID = null) {
     body: `
       <form id="station-form" data-id="${station?.id || ""}">
         <label class="field"><span>Name</span><input id="station-name" value="${escapeHTML(station?.name || "")}" required></label>
-        <div class="field-grid"><label class="field"><span>Übertragungsart</span><select id="station-mode"><option value="digital" ${station?.defaultMode === "digital" ? "selected" : ""}>Digital</option><option value="print" ${station?.defaultMode === "print" ? "selected" : ""}>Druckausgabe</option></select></label><label class="field"><span>Warnung nach Minuten</span><input id="station-warning" type="number" min="1" max="120" value="${Number(station?.warningMinutes || 12)}"></label></div>
+        <div class="field-grid"><label class="field"><span>Ausgabeweg</span><select id="station-mode"><option value="digital" ${station?.defaultMode === "digital" ? "selected" : ""}>Digitales Stationsdisplay</option><option value="print" ${station?.defaultMode === "print" ? "selected" : ""}>Bondruck</option></select></label><label class="field"><span>Warnung nach Minuten</span><input id="station-warning" type="number" min="1" max="120" value="${Number(station?.warningMinutes || 12)}"></label></div>
         <label class="check"><input id="station-active" type="checkbox" ${station?.isActive !== false ? "checked" : ""}><span>Station ist aktiv</span></label>
       </form>`,
     footer: `<button class="secondary" type="button" data-modal-action="close">Abbrechen</button><button class="primary" type="button" data-modal-action="save-station">Speichern</button>`
@@ -2245,13 +2503,15 @@ async function saveStation() {
     String(item.name).localeCompare(name, "de", { sensitivity: "base" }) === 0
   ) || app.data.team.some((item) =>
     String(item.name).localeCompare(name, "de", { sensitivity: "base" }) === 0
+  ) || app.data.devices.some((item) =>
+    String(item.loginName || item.name).localeCompare(name, "de", { sensitivity: "base" }) === 0
   )) {
-    toast("Name bereits vergeben", "Stations- und Mitarbeiternamen müssen eindeutig sein.", "error");
+    toast("Name bereits vergeben", "Stations-, Mitarbeiter- und Gerätenamen müssen eindeutig sein.", "error");
     return;
   }
   let operatingMode = app.data.kitchenOperatingMode;
   if (!operatingModeSupports(operatingMode, stationMode)) {
-    if (!window.confirm("Diese Station passt nicht zur aktuellen Betriebsart. Auf „Kombiniert“ wechseln?")) return;
+    if (!window.confirm("Diese Station passt nicht zur aktuellen Ausgabeart. Auf „Kombiniert“ wechseln?")) return;
     operatingMode = "hybrid";
   }
   const station = {
@@ -2328,6 +2588,10 @@ function handleViewClick(event) {
   if (productID) return openProductEditor(productID);
   const stationID = event.target.closest("[data-station-id]")?.dataset.stationId;
   if (stationID) return openStationEditor(stationID);
+  const memberID = event.target.closest("[data-member-id]")?.dataset.memberId;
+  if (memberID) return openMemberEditor(memberID);
+  const deviceID = event.target.closest("[data-device-id]")?.dataset.deviceId;
+  if (deviceID) return openDeviceEditor(deviceID);
   const guestID = event.target.closest("[data-guest-id]")?.dataset.guestId;
   if (guestID) return openGuestProfile(guestID);
   const nextTicket = event.target.closest("[data-ticket-next]");
@@ -2347,6 +2611,7 @@ function handleViewClick(event) {
   if (action === "add-product") openProductEditor();
   if (action === "manage-categories") openCategoryManager();
   if (action === "add-member") openMemberEditor();
+  if (action === "add-device") openDeviceEditor();
   if (action === "add-station") openStationEditor();
   if (action === "save-operating-mode") saveKitchenOperatingMode();
   if (action === "plan-shift") openScheduledShiftEditor();
@@ -2386,6 +2651,9 @@ function handleModalClick(event) {
   if (action === "remove-product-option") target.closest(".option-editor")?.remove();
   if (action === "delete-product") deleteProduct(id);
   if (action === "save-member") saveMember();
+  if (action === "delete-member") deleteMember(id);
+  if (action === "save-device") saveDevice();
+  if (action === "delete-device") deleteDevice(id);
   if (action === "save-scheduled-shift") saveScheduledShift();
   if (action === "save-table") saveTable();
   if (action === "save-station") saveStation();
@@ -2422,6 +2690,18 @@ async function login(event) {
       throw new Error("Gerätezugänge können sich nicht im Web-Dashboard anmelden.");
     }
     await loadWorkspace(session.restaurant_id);
+    const isDeviceAccess = app.data.devices.some(
+      (device) =>
+        String(device.loginName || device.name).localeCompare(
+          session.username,
+          "de",
+          { sensitivity: "base" }
+        ) === 0
+    );
+    if (isDeviceAccess) {
+      await logout();
+      throw new Error("Gerätezugänge können sich nur in der Servora-App anmelden.");
+    }
   } catch (caught) {
     error.textContent = friendlyError(caught);
     error.classList.remove("hidden");
@@ -2494,7 +2774,6 @@ async function submitGate(event) {
   const valid = (await sha256($("gate-pin").value)) === DEVELOPMENT_PIN_HASH;
   $("gate-error").classList.toggle("hidden", valid);
   if (!valid) return;
-  sessionStorage.setItem(ACCESS_SESSION_KEY, "granted");
   $("development-gate").classList.add("hidden");
   await start();
 }
@@ -2552,10 +2831,7 @@ window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
 
 updateOnlineStatus();
-if (
-  !DEVELOPMENT_MODE ||
-  sessionStorage.getItem(ACCESS_SESSION_KEY) === "granted"
-) {
+if (!DEVELOPMENT_MODE) {
   $("development-gate").classList.add("hidden");
   start();
 }
