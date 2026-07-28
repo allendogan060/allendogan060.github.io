@@ -11,7 +11,7 @@
             "?": {
               "r": "*"
             },
-            "comment": "Öffnet öffentliche Taviko-Reservierungslinks in der installierten App."
+            "comment": "Öffnet öffentliche Haviko-Reservierungslinks in der installierten App."
           }
         ]
       }
