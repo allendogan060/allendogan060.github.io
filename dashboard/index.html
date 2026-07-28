@@ -6,24 +6,45 @@
   <meta name="theme-color" content="#0d4a3c">
   <meta name="application-name" content="Haviko">
   <meta name="apple-mobile-web-app-title" content="Haviko">
+  <meta name="apple-itunes-app" content="app-id=6794772408, app-argument=https://login.haviko.de/">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <title>Anmelden | Haviko</title>
   <meta name="theme-color" content="#00866a">
-  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png?v=7">
-  <link rel="icon" type="image/png" sizes="48x48" href="../assets/favicon-48.png?v=7">
-  <link rel="icon" type="image/png" sizes="192x192" href="../assets/haviko-icon-192.png?v=7">
-  <link rel="shortcut icon" type="image/png" href="../assets/favicon-48.png?v=7">
-  <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png?v=7">
-  <link rel="manifest" href="../site.webmanifest?v=7">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png?v=8">
+  <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png?v=8">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/haviko-icon-192.png?v=8">
+  <link rel="shortcut icon" type="image/png" href="/assets/favicon-48.png?v=8">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png?v=8">
+  <link rel="manifest" href="./site.webmanifest?v=7">
   <link rel="stylesheet" href="./styles.css?v=6">
+  <script>
+    (() => {
+      const hasAccess = document.cookie
+        .split(";")
+        .map((value) => value.trim())
+        .some((value) => value === "haviko_preview_access=granted");
+      if (!hasAccess && window.location.hostname !== "localhost") {
+        window.location.replace(
+          `https://autorisieren.haviko.de/?next=${encodeURIComponent(window.location.href)}`
+        );
+      }
+    })();
+  </script>
 </head>
-<body>
+<body class="is-booting">
   <div class="offline-banner hidden" id="offline-banner" role="status">
     Offline – Änderungen sind erst wieder online möglich.
   </div>
 
-  <section class="development-gate" id="development-gate" aria-label="Entwicklungsvorschau">
-    <div class="gate-brand"><img class="brand-mark" src="../assets/haviko-app-icon.png" alt=""><strong>Haviko</strong></div>
+  <section class="boot-shell" id="boot-shell" aria-live="polite">
+    <img class="boot-mark" src="/assets/haviko-app-icon.png" alt="">
+    <strong>Haviko</strong>
+    <span>Zugang wird geprüft</span>
+    <i aria-hidden="true"></i>
+  </section>
+
+  <section class="development-gate hidden" id="development-gate" aria-label="Entwicklungsvorschau">
+    <div class="gate-brand"><img class="brand-mark" src="./assets/haviko-app-icon.png" alt=""><strong>Haviko</strong></div>
     <p class="eyebrow">Nicht öffentlich</p>
     <h1>Entwicklungsvorschau</h1>
     <p>Das Web-Dashboard befindet sich im geschützten Funktionstest.</p>
@@ -39,7 +60,7 @@
 
   <main class="auth-shell hidden" id="auth-shell">
     <section class="auth-brand">
-      <div class="brand-lockup"><img class="brand-mark large" src="../assets/haviko-app-icon.png" alt=""><span>Haviko</span></div>
+      <div class="brand-lockup"><img class="brand-mark large" src="./assets/haviko-app-icon.png" alt=""><span>Haviko</span></div>
       <div>
         <p class="eyebrow">Haviko Verwaltung</p>
         <h1>Restaurantbetrieb</h1>
@@ -110,12 +131,57 @@
           <span>Passwort</span>
           <input id="register-password" type="password" autocomplete="new-password" minlength="8" required>
         </label>
+        <label class="field">
+          <span>Recovery-E-Mail</span>
+          <input id="register-email" type="email" autocomplete="email" required>
+        </label>
+        <p class="field-hint">Diese Adresse wird nach der Erstellung per Link bestätigt und schützt die Passwort-Wiederherstellung.</p>
+        <div class="field-grid">
+          <label class="field">
+            <span>Telefon</span>
+            <input id="register-phone" type="tel" autocomplete="tel">
+          </label>
+          <label class="field">
+            <span>Website</span>
+            <input id="register-website" type="url" autocomplete="url" placeholder="https://">
+          </label>
+        </div>
+        <label class="field">
+          <span>Adresse</span>
+          <input id="register-address" autocomplete="street-address">
+        </label>
+        <label class="field">
+          <span>Bereiche</span>
+          <input id="register-areas" value="Innenbereich, Terrasse">
+        </label>
+        <div class="field-grid">
+          <label class="field">
+            <span>Bestellmodus</span>
+            <select id="register-routing">
+              <option value="digitalKitchen">Digitale Stationen</option>
+              <option value="printedKitchen">Bondruck</option>
+              <option value="hybrid">Kombiniert</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Standard-Reservierung</span>
+            <select id="register-reservation-duration">
+              <option value="60">60 Minuten</option>
+              <option value="90" selected>90 Minuten</option>
+              <option value="120">120 Minuten</option>
+            </select>
+          </label>
+        </div>
         <label class="check">
           <input id="register-terms" type="checkbox" required>
-          <span>Ich bestätige, dass ich den Betrieb anlegen darf und akzeptiere die Testbedingungen.</span>
+          <span>Ich bestätige, dass ich den Betrieb anlegen darf und akzeptiere die Nutzungsbedingungen.</span>
+        </label>
+        <label class="check">
+          <input id="register-privacy" type="checkbox" required>
+          <span>Ich akzeptiere die Datenschutzerklärung und die Verarbeitung für Konto, Cloud-Synchronisierung und Sicherheits-E-Mails.</span>
         </label>
         <p class="form-error hidden" id="register-error" role="alert"></p>
-        <button class="primary full" id="register-submit" type="submit">Restaurant sicher erstellen</button>
+        <button class="primary full" id="register-submit" type="submit">Einrichtung abschließen</button>
       </form>
     </section>
   </main>
@@ -123,7 +189,7 @@
   <div class="app-shell hidden" id="app-shell">
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <img class="brand-mark" src="../assets/haviko-app-icon.png" alt="">
+        <img class="brand-mark" src="./assets/haviko-app-icon.png" alt="">
         <div><strong>Haviko</strong><small>Betriebsverwaltung</small></div>
       </div>
       <nav id="desktop-navigation" aria-label="Hauptnavigation"></nav>
@@ -173,12 +239,12 @@
 
   <template id="empty-template">
     <div class="empty-state">
-      <img class="empty-mark" src="../assets/haviko-app-icon.png" alt="">
+      <img class="empty-mark" src="./assets/haviko-app-icon.png" alt="">
       <h2></h2>
       <p></p>
     </div>
   </template>
 
-  <script type="module" src="./app.js?v=6"></script>
+  <script type="module" src="./app.js?v=8"></script>
 </body>
 </html>
