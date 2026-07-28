@@ -1,11 +1,11 @@
-# Seriva Web und Online-Reservierung
+# Taviko Web und Online-Reservierung
 
 Diese Dateien gehören in das Repository `allendogan060.github.io`.
 
 Enthalten sind:
 
-- `index.html`: Seriva-Startseite sowie öffentliche Reservierung, Stornierung, Bewertung, Support und Rechtstexte
-- `dashboard/`: Web-Anmeldung, Restaurant-Erstellung und rollenbasierter Seriva-Arbeitsbereich
+- `index.html`: Taviko-Startseite sowie öffentliche Reservierung, Stornierung, Bewertung, Support und Rechtstexte
+- `dashboard/`: Web-Anmeldung, Restaurant-Erstellung und rollenbasierter Taviko-Arbeitsbereich
 - `assets/`: lokal ausgelieferte Bilddateien
 - `.well-known/`: Vorbereitung für Universal Links
 
@@ -45,14 +45,14 @@ PIN-Eingabe.
    App-Projekt `Restaurant/supabase/web_dashboard_migration.sql`,
    `Restaurant/supabase/operational_routing_identity_migration.sql` und
    `Restaurant/supabase/device_access_management_migration.sql` ausführen.
-5. In Seriva unter `Online-Reservierung` die Funktion aktivieren und speichern.
+5. In Taviko unter `Online-Reservierung` die Funktion aktivieren und speichern.
 
 Das Dashboard ist anschließend unter
 `https://allendogan060.github.io/dashboard/` erreichbar. Restaurantleitung,
 Management, Service, Küche und Bar verwenden Restaurantkennung, ihren Namen
 und ihr persönliches Passwort. Die Restaurantleitung kann Mitarbeiter,
 individuelle Rechte und Gerätezugänge im Web-Dashboard verwalten. Geräte selbst
-melden sich weiterhin ausschließlich in der nativen Seriva-App an.
+melden sich weiterhin ausschließlich in der nativen Taviko-App an.
 
 Die Auftragsausgabe verwendet dieselben Begriffe wie die App:
 
@@ -68,8 +68,8 @@ Die Restaurant-Erstellung ist zusätzlich im Web möglich. Der bestehende
 Erstellungsablauf in der App bleibt während der Testphase erhalten, damit bei
 einem Web- oder Hostingproblem kein Betrieb ausgesperrt wird.
 
-Die Startadresse `https://allendogan060.github.io/` zeigt die Seriva-Startseite.
-Ist im Browser bereits eine gültige Seriva-Websitzung gespeichert, wird direkt
+Die Startadresse `https://allendogan060.github.io/` zeigt die Taviko-Startseite.
+Ist im Browser bereits eine gültige Taviko-Websitzung gespeichert, wird direkt
 zum Dashboard weitergeleitet. Ansonsten führen die Schaltflächen „Anmelden“ und
 „Restaurant erstellen“ in den passenden Dashboard-Ablauf.
 
@@ -86,7 +86,7 @@ Vor einer öffentlichen Freigabe zusätzlich:
    `#impressum`, `#datenschutz`, `#nutzungsbedingungen` und `#agb` dann ohne
    Entwicklungs-PIN testen.
 
-Seriva erzeugt danach automatisch Links nach diesem Muster:
+Taviko erzeugt danach automatisch Links nach diesem Muster:
 
 `https://allendogan060.github.io/?r=EINDEUTIGE-RESTAURANT-ID`
 
