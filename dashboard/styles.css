@@ -43,6 +43,38 @@ body {
   letter-spacing: 0;
 }
 
+.boot-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 9px;
+  background: var(--forest-deep);
+  color: white;
+}
+
+.boot-mark {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+}
+
+.boot-shell strong { font-size: 24px; }
+.boot-shell span { color: rgba(255,255,255,0.62); font-size: 13px; }
+.boot-shell i {
+  width: 24px;
+  height: 24px;
+  margin-top: 14px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: boot-spin 750ms linear infinite;
+}
+@keyframes boot-spin { to { transform: rotate(360deg); } }
+
 button, input, select, textarea { min-width: 0; font: inherit; letter-spacing: 0; }
 button {
   cursor: pointer;
@@ -137,7 +169,7 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
   padding: clamp(30px, 5vw, 68px);
   background:
     linear-gradient(rgba(8, 55, 45, 0.94), rgba(13, 74, 60, 0.94)),
-    url("../assets/restaurant-workspace.png") center/cover;
+    url("./assets/restaurant-workspace.png") center/cover;
   color: white;
 }
 
@@ -626,6 +658,16 @@ input:focus, select:focus, textarea:focus { border-color: var(--action); box-sha
 .empty-mark { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; }
 .empty-state h2 { margin: 14px 0 5px; font-size: 19px; }
 .empty-state p { max-width: 430px; margin: 0; color: var(--muted); line-height: 1.5; }
+.code-card {
+  width: 100%;
+  max-width: 260px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-muted);
+  font-size: 1.35rem;
+  letter-spacing: 0;
+}
 
 dialog { width: min(100% - 28px, 650px); max-height: min(90vh, 820px); border: 0; border-radius: var(--radius); padding: 0; box-shadow: 0 30px 90px rgba(8,55,45,0.26); }
 dialog::backdrop { background: rgba(7,28,23,0.52); backdrop-filter: blur(3px); }
