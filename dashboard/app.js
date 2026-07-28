@@ -2,7 +2,7 @@ const SUPABASE_URL = "https://dlapwemckfhxklytbqkk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_VeeQLARNn-sULZ4snvp3HA_Hd78H5RN";
 const DEVELOPMENT_MODE = true;
 const DEVELOPMENT_PIN_HASH =
-  "5f20b9b81da6a3163f1cc96b603868330378255157dae99d8a6d7cc5fa3d6a19";
+  "763f0a51a8e57db6ca611f045f3c5acc85075b79cedebf010f0d2277fb966c3e";
 const AUTH_STORAGE_KEY = "servora-web-session";
 const LAST_RESTAURANT_KEY = "servora-web-restaurant";
 const SWIFT_REFERENCE_SECONDS = 978307200;
@@ -632,11 +632,13 @@ function toast(title, message, type = "success") {
 }
 
 function showAuth() {
+  document.title = "Anmelden | Haviko";
   $("auth-shell").classList.remove("hidden");
   $("app-shell").classList.add("hidden");
 }
 
 function showWorkspace() {
+  document.title = "Dashboard | Haviko";
   $("auth-shell").classList.add("hidden");
   $("app-shell").classList.remove("hidden");
   $("restaurant-name").textContent = app.data.restaurantName;
@@ -2757,6 +2759,7 @@ async function logout() {
 
 function switchAuth(mode) {
   const loginMode = mode === "login";
+  document.title = loginMode ? "Anmelden | Haviko" : "Restaurant erstellen | Haviko";
   $("login-form").classList.toggle("hidden", !loginMode);
   $("register-form").classList.toggle("hidden", loginMode);
   $("login-tab").classList.toggle("selected", loginMode);
