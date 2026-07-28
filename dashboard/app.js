@@ -581,7 +581,7 @@ async function savePatch(patch, message = "Gespeichert") {
       await loadWorkspace(app.workspace.restaurantId);
       toast(
         "Daten wurden aktualisiert",
-        "Eine andere Servora-Instanz war schneller. Der aktuelle Stand wurde neu geladen.",
+        "Eine andere Seriva-Instanz war schneller. Der aktuelle Stand wurde neu geladen.",
         "error"
       );
     } else {
@@ -601,7 +601,7 @@ function friendlyError(error) {
     return "Anonyme Supabase-Anmeldung ist noch nicht aktiviert.";
   }
   if (message.includes("Failed to fetch")) {
-    return "Servora konnte den Server nicht erreichen.";
+    return "Seriva konnte den Server nicht erreichen.";
   }
   if (message.includes("Access denied")) {
     return "Deine Rolle darf diese Aktion nicht ausführen.";
@@ -716,7 +716,7 @@ function navigate(routeID) {
 
 function render() {
   const route = routes.find((item) => item.id === app.route);
-  $("page-title").textContent = route?.title || "Servora";
+  $("page-title").textContent = route?.title || "Seriva";
   switch (app.route) {
     case "tables": renderTables(); break;
     case "orders": renderOrders(); break;
@@ -776,7 +776,7 @@ function renderOverview() {
     </div>
     <div class="split-layout">
       <section class="section">
-        <header class="section-header"><div><h2>Heute im Betrieb</h2><span>Live aus Servora</span></div></header>
+        <header class="section-header"><div><h2>Heute im Betrieb</h2><span>Live aus Seriva</span></div></header>
         <div class="section-body">
           ${activities.length ? `
             <div class="activity-list">${activities.map((item) => `
@@ -1281,7 +1281,7 @@ function renderAnalytics() {
   });
   const topProducts = Object.entries(productSales).sort((a, b) => b[1] - a[1]).slice(0, 8);
   $("view").innerHTML = `
-    <div class="page-tools"><div><h2>Betriebsstatistik</h2><p>Aus den synchronisierten Servora-Vorgängen.</p></div></div>
+    <div class="page-tools"><div><h2>Betriebsstatistik</h2><p>Aus den synchronisierten Seriva-Vorgängen.</p></div></div>
     <div class="metric-grid">
       ${metric("Erfasster Umsatz", formatCurrency(revenue || tableRevenue), `${payments.length} Zahlungen`, "€")}
       ${metric("Reservierungsgäste", String(reservationGuests), `${app.data.reservations.length} Buchungen`, "◎")}
@@ -1444,7 +1444,7 @@ function renderSettings() {
       <section class="section">
         <header class="section-header"><h2>Geräte, Stationen & Drucker</h2></header>
         <div class="section-body">
-          <p>Gerätezugänge werden im Team-Bereich verwaltet und ausschließlich in der Servora-App angemeldet.</p>
+          <p>Gerätezugänge werden im Team-Bereich verwaltet und ausschließlich in der Seriva-App angemeldet.</p>
           <p class="field-hint">Kassen öffnen Tische und Theke. Digitale Stationsdisplays zeigen nur die Aufträge ihrer zugewiesenen Station. Klassische Bondrucker besitzen keinen Mitarbeiterzugang.</p>
         </div>
       </section>
@@ -1529,7 +1529,7 @@ function useCurrentBusinessLocation() {
   );
 }
 
-function openModal({ eyebrow = "Servora", title, body, footer = "" }) {
+function openModal({ eyebrow = "Seriva", title, body, footer = "" }) {
   $("modal-eyebrow").textContent = eyebrow;
   $("modal-title").textContent = title;
   $("modal-body").innerHTML = body;
@@ -2476,7 +2476,7 @@ function openStationEditor(stationID = null) {
 
 function openAccountMenu() {
   openModal({
-    eyebrow: roleTitles[app.workspace.role] || "Servora",
+    eyebrow: roleTitles[app.workspace.role] || "Seriva",
     title: app.data.restaurantName,
     body: `
       <div class="detail-list">
@@ -2484,7 +2484,7 @@ function openAccountMenu() {
         <div><span>Angemeldet als</span><strong>${escapeHTML(app.workspace.displayName || app.workspace.username)}</strong></div>
         <div><span>Anmeldename</span><strong>${escapeHTML(app.workspace.username)}</strong></div>
       </div>
-      <p class="modal-note">Geräte- und Druckerzugänge werden aus Sicherheitsgründen ausschließlich in der Servora App verwendet.</p>`,
+      <p class="modal-note">Geräte- und Druckerzugänge werden aus Sicherheitsgründen ausschließlich in der Seriva App verwendet.</p>`,
     footer: `
       <button class="secondary" type="button" data-modal-action="copy-code">Kennung kopieren</button>
       <button class="danger" type="button" data-modal-action="logout">Abmelden</button>`
@@ -2700,7 +2700,7 @@ async function login(event) {
     );
     if (isDeviceAccess) {
       await logout();
-      throw new Error("Gerätezugänge können sich nur in der Servora-App anmelden.");
+      throw new Error("Gerätezugänge können sich nur in der Seriva-App anmelden.");
     }
   } catch (caught) {
     error.textContent = friendlyError(caught);
