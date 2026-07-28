@@ -40,15 +40,29 @@ PIN-Eingabe.
 4. In Supabase zuerst `online_booking_migration.sql` und danach
    `booking_availability_waitlist_migration.sql` sowie
    `reservation_confirmation_email_migration.sql` und
-   `reservation_reviews_push_migration.sql` ausführen. Anschließend aus dem
-   App-Projekt `Restaurant/supabase/web_dashboard_migration.sql` ausführen.
+   `reservation_reviews_push_migration.sql` sowie
+   `reservation_review_email_migration.sql` ausführen. Anschließend aus dem
+   App-Projekt `Restaurant/supabase/web_dashboard_migration.sql`,
+   `Restaurant/supabase/operational_routing_identity_migration.sql` und
+   `Restaurant/supabase/device_access_management_migration.sql` ausführen.
 5. In Servora unter `Online-Reservierung` die Funktion aktivieren und speichern.
 
 Das Dashboard ist anschließend unter
 `https://allendogan060.github.io/dashboard/` erreichbar. Restaurantleitung,
-Management, Service, Küche und Bar verwenden Restaurantkennung, Benutzernamen
-und persönliches Passwort. Geräte- und Druckerzugänge bleiben bewusst in der
-nativen Servora-App.
+Management, Service, Küche und Bar verwenden Restaurantkennung, ihren Namen
+und ihr persönliches Passwort. Die Restaurantleitung kann Mitarbeiter,
+individuelle Rechte und Gerätezugänge im Web-Dashboard verwalten. Geräte selbst
+melden sich weiterhin ausschließlich in der nativen Servora-App an.
+
+Die Auftragsausgabe verwendet dieselben Begriffe wie die App:
+
+- `Nur digitale Stationen`
+- `Nur Bondruck`
+- `Kombiniert`
+
+Kassen und digitale Stationsdisplays besitzen eigene Gerätezugänge. Klassische
+Bondrucker sind keine Benutzerkonten und erscheinen deshalb nicht als
+Mitarbeiter oder Geräte-Login.
 
 Die Restaurant-Erstellung ist zusätzlich im Web möglich. Der bestehende
 Erstellungsablauf in der App bleibt während der Testphase erhalten, damit bei

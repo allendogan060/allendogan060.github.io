@@ -6,10 +6,13 @@
   <meta name="theme-color" content="#0a5a49">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
   <meta name="description" content="Servora verbindet Restaurantbetrieb, Reservierungen, Tische, Bestellungen und Team in einem Arbeitsbereich.">
+  <meta name="application-name" content="Servora">
+  <meta name="apple-mobile-web-app-title" content="Servora">
   <link rel="preconnect" href="https://dlapwemckfhxklytbqkk.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="//dlapwemckfhxklytbqkk.supabase.co">
-  <link rel="icon" type="image/png" href="./assets/servora-app-icon.png">
-  <link rel="apple-touch-icon" href="./assets/servora-app-icon.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="./assets/servora-app-icon.png?v=3">
+  <link rel="shortcut icon" type="image/png" href="./assets/servora-app-icon.png?v=3">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/servora-app-icon.png?v=3">
   <title>Servora – Restaurantbetrieb einfach organisiert</title>
   <style>
     :root {
@@ -52,7 +55,11 @@
 
     button, input, select, textarea { font: inherit; }
     button, select { cursor: pointer; }
-    button { touch-action: manipulation; }
+    button {
+      max-width: 100%;
+      touch-action: manipulation;
+      overflow-wrap: anywhere;
+    }
     a { color: var(--action); }
     img { display: block; max-width: 100%; }
     [hidden], .hidden { display: none !important; }
@@ -211,6 +218,7 @@
     }
 
     .landing-actions a {
+      min-width: 0;
       min-height: 42px;
       padding: 10px 15px;
       display: inline-flex;
@@ -279,6 +287,7 @@
     }
 
     .landing-hero-actions a {
+      min-width: 0;
       min-height: 48px;
       padding: 12px 18px;
       display: inline-flex;
@@ -743,6 +752,7 @@
     }
 
     .step-actions {
+      min-width: 0;
       margin-top: 26px;
       padding-top: 20px;
       border-top: 1px solid var(--line);
@@ -752,6 +762,7 @@
     }
 
     .primary, .secondary, .quiet {
+      min-width: 0;
       min-height: 50px;
       padding: 11px 18px;
       border-radius: 7px;
@@ -918,6 +929,7 @@
     }
 
     .confirmation-actions {
+      min-width: 0;
       margin-top: 24px;
       display: flex;
       justify-content: center;
@@ -1186,6 +1198,7 @@
       .step-actions .primary { min-width: 0; flex: 1; }
       .confirmation { padding: 28px 18px; }
       .confirmation-actions { flex-direction: column; }
+      .confirmation-actions > button { width: 100%; }
       .footer-inner { flex-direction: column; }
       .footer-links { justify-content: flex-start; }
       .legal-content { padding: 20px 17px 30px; }
@@ -2107,7 +2120,6 @@
       const DEVELOPMENT_MODE = true;
       const DEVELOPMENT_PIN_HASH =
         "5f20b9b81da6a3163f1cc96b603868330378255157dae99d8a6d7cc5fa3d6a19";
-      const ACCESS_SESSION_KEY = "servora-development-access";
       const params = new URLSearchParams(window.location.search);
       const publicID = params.get("r");
       const cancellationToken = params.get("cancel");
@@ -2115,6 +2127,7 @@
       const requestedLegalDocument = window.location.hash.slice(1);
       const hasPublicRoute = Boolean(publicID || cancellationToken || reviewCode);
       let siteStarted = false;
+      let previewUnlocked = false;
 
       const state = {
         snapshot: null,
@@ -2155,6 +2168,7 @@
       }
 
       function openDevelopmentPreview() {
+        previewUnlocked = true;
         $("development-gate").classList.add("hidden");
         $("site-content").removeAttribute("inert");
         $("site-content").removeAttribute("aria-hidden");
@@ -2174,7 +2188,6 @@
         $("gate-error").classList.add("hidden");
 
         if (await sha256(input.value.trim()) === DEVELOPMENT_PIN_HASH) {
-          sessionStorage.setItem(ACCESS_SESSION_KEY, "granted");
           openDevelopmentPreview();
           return;
         }
@@ -2213,10 +2226,17 @@
           .find((day) => Number(day.id) === weekday);
       }
 
+      function tableAcceptsOnlineBookings(table) {
+        const status = String(table?.status || "").toLowerCase();
+        return table?.isOnlineBookable &&
+          !table?.isPlaceholder &&
+          status !== "besetzt" &&
+          status !== "reinigen";
+      }
+
       function eligibleTables(area) {
         return (state.snapshot?.tables || []).filter((table) =>
-          table.isOnlineBookable &&
-          !table.isPlaceholder &&
+          tableAcceptsOnlineBookings(table) &&
           table.area === area &&
           Number(table.capacity) >= state.guests
         );
@@ -2458,14 +2478,24 @@
         if (step === 2) {
           let valid = true;
           for (const element of visibleRequiredFields(2)) {
-            const fieldValid = element.type === "checkbox" ? element.checked : element.value.trim() !== "";
+            const fieldValid = element.type === "checkbox"
+              ? element.checked
+              : element.value.trim() !== "" && element.checkValidity();
             element.setAttribute("aria-invalid", showErrors && !fieldValid ? "true" : "false");
             valid = valid && fieldValid;
           }
-          const contactValid = $("email").value.trim() !== "" || $("phone").value.trim() !== "";
+          const email = $("email").value.trim();
+          const phone = $("phone").value.trim();
+          const emailValid = email === "" || $("email").checkValidity();
+          const phoneValid =
+            phone === "" ||
+            (/^[+0-9 ()/-]+$/.test(phone) && phone.replace(/\D/g, "").length >= 6);
+          const contactValid = (email !== "" || phone !== "") && emailValid && phoneValid;
           if (showErrors && !contactValid) {
             $("contact-error").textContent =
-              "Bitte gib mindestens eine E-Mail-Adresse oder Telefonnummer an.";
+              email === "" && phone === ""
+                ? "Bitte gib mindestens eine E-Mail-Adresse oder Telefonnummer an."
+                : "Bitte prüfe die eingegebene E-Mail-Adresse oder Telefonnummer.";
           }
           $("contact-error").classList.toggle("hidden", !showErrors || contactValid);
           return valid && contactValid;
@@ -2534,7 +2564,7 @@
 
         const bookableAreas = [...new Set(
           (snapshot.tables || [])
-            .filter((table) => table.isOnlineBookable && !table.isPlaceholder)
+            .filter(tableAcceptsOnlineBookings)
             .map((table) => table.area)
         )];
         const configured = settings.allowedAreas?.length
@@ -2831,7 +2861,7 @@
       function openLegal(documentName, updateHash = true) {
         if (
           DEVELOPMENT_MODE &&
-          sessionStorage.getItem(ACCESS_SESSION_KEY) !== "granted"
+          !previewUnlocked
         ) {
           return;
         }
@@ -2976,7 +3006,7 @@
 
       updateOnlineStatus();
 
-      if (!DEVELOPMENT_MODE || sessionStorage.getItem(ACCESS_SESSION_KEY) === "granted") {
+      if (!DEVELOPMENT_MODE) {
         openDevelopmentPreview();
       } else {
         $("development-pin").focus();
