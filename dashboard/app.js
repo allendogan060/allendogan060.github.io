@@ -5,6 +5,12 @@ const DEVELOPMENT_PIN_HASH =
   "763f0a51a8e57db6ca611f045f3c5acc85075b79cedebf010f0d2277fb966c3e";
 const AUTH_STORAGE_KEY = "servora-web-session";
 const LAST_RESTAURANT_KEY = "servora-web-restaurant";
+const SHARED_SESSION_COOKIE = "haviko_web_session";
+const SHARED_RESTAURANT_COOKIE = "haviko_web_restaurant";
+const LOGIN_URL = "https://login.haviko.de/";
+const DASHBOARD_URL = "https://dashboard.haviko.de/";
+const IS_LOGIN_HOST = window.location.hostname === "login.haviko.de";
+const IS_DASHBOARD_HOST = window.location.hostname === "dashboard.haviko.de";
 const SWIFT_REFERENCE_SECONDS = 978307200;
 const INITIAL_AUTH_MODE =
   new URLSearchParams(window.location.search).get("mode") === "register"
@@ -23,7 +29,8 @@ const app = {
   orderCart: [],
   orderTableID: null,
   reviews: [],
-  loading: false
+  loading: false,
+  isLoggingOut: false
 };
 
 const roleTitles = {
@@ -236,6 +243,46 @@ async function rpc(name, parameters = {}) {
 function saveSession(session) {
   app.session = session;
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  const sharedSession = {
+    access_token: session?.access_token,
+    refresh_token: session?.refresh_token,
+    expires_at: session?.expires_at,
+    expires_in: session?.expires_in,
+    token_type: session?.token_type
+  };
+  document.cookie =
+    `${SHARED_SESSION_COOKIE}=${encodeURIComponent(JSON.stringify(sharedSession))}; ` +
+    "Max-Age=2592000; Path=/; Domain=.haviko.de; Secure; SameSite=Lax";
+}
+
+function readCookie(name) {
+  const prefix = `${name}=`;
+  const item = document.cookie
+    .split(";")
+    .map((value) => value.trim())
+    .find((value) => value.startsWith(prefix));
+  return item ? decodeURIComponent(item.slice(prefix.length)) : null;
+}
+
+function readStoredSession() {
+  try {
+    const local = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || "null");
+    if (local?.access_token || local?.refresh_token) return local;
+    return JSON.parse(readCookie(SHARED_SESSION_COOKIE) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function saveLastRestaurant(restaurantID) {
+  localStorage.setItem(LAST_RESTAURANT_KEY, restaurantID);
+  document.cookie =
+    `${SHARED_RESTAURANT_COOKIE}=${encodeURIComponent(restaurantID)}; ` +
+    "Max-Age=2592000; Path=/; Domain=.haviko.de; Secure; SameSite=Lax";
+}
+
+function readLastRestaurant() {
+  return localStorage.getItem(LAST_RESTAURANT_KEY) || readCookie(SHARED_RESTAURANT_COOKIE);
 }
 
 function clearSession() {
@@ -244,6 +291,10 @@ function clearSession() {
   app.data = null;
   localStorage.removeItem(AUTH_STORAGE_KEY);
   localStorage.removeItem(LAST_RESTAURANT_KEY);
+  document.cookie =
+    `${SHARED_SESSION_COOKIE}=; Max-Age=0; Path=/; Domain=.haviko.de; Secure; SameSite=Lax`;
+  document.cookie =
+    `${SHARED_RESTAURANT_COOKIE}=; Max-Age=0; Path=/; Domain=.haviko.de; Secure; SameSite=Lax`;
 }
 
 async function createAnonymousSession() {
@@ -282,11 +333,7 @@ async function refreshSession(refreshToken) {
 
 async function ensureSession() {
   if (!app.session) {
-    try {
-      app.session = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || "null");
-    } catch {
-      clearSession();
-    }
+    app.session = readStoredSession();
   }
   if (
     app.session?.access_token &&
@@ -535,8 +582,8 @@ function normalizeState(state = {}) {
   };
 }
 
-async function initializeRestaurantState(session) {
-  const initial = defaultState(session);
+async function initializeRestaurantState(session, setup = {}) {
+  const initial = applyRegistrationSetup(defaultState(session), setup);
   const result = await rpc("web_initialize_restaurant_state", {
     p_restaurant_id: session.restaurant_id,
     p_state: initial
@@ -544,16 +591,122 @@ async function initializeRestaurantState(session) {
   return result;
 }
 
+function registrationSetup() {
+  const areas = $("register-areas").value
+    .split(",")
+    .map((area) => area.trim())
+    .filter(Boolean);
+  const routing = $("register-routing").value;
+  const reservationDuration = Number($("register-reservation-duration").value || 90);
+  return {
+    email: $("register-email").value.trim().toLowerCase(),
+    phone: $("register-phone").value.trim(),
+    website: $("register-website").value.trim(),
+    address: $("register-address").value.trim(),
+    areas: areas.length ? areas : ["Innenbereich"],
+    routing,
+    reservationDuration
+  };
+}
+
+function applyRegistrationSetup(state, setup) {
+  const areas = setup.areas || ["Innenbereich"];
+  const booking = state.onlineBookingConfiguration || defaultOnlineBookingConfiguration();
+  booking.restaurant.restaurantType = $("register-type").value;
+  booking.restaurant.address = setup.address || "";
+  booking.restaurant.phone = setup.phone || "";
+  booking.restaurant.email = setup.email || "";
+  booking.restaurant.website = setup.website || "";
+  booking.restaurant.settings.allowedAreas = areas;
+  booking.restaurant.settings.standardDurationMinutes = setup.reservationDuration || 90;
+  return {
+    ...state,
+    areas,
+    kitchenOperatingMode: setup.routing || "digitalKitchen",
+    stations: [
+      {
+        id: uuid(),
+        name: "Küche",
+        icon: "flame",
+        defaultMode: setup.routing === "printedKitchen" ? "print" : "digital",
+        accessUsername: null,
+        colorName: "orange",
+        isActive: true,
+        warningMinutes: 12,
+        printerID: null
+      }
+    ],
+    onlineBookingConfiguration: booking
+  };
+}
+
+async function fetchLegalBundle() {
+  try {
+    return await rpc("get_current_legal_bundle");
+  } catch {
+    return { termsVersion: 1, privacyVersion: 1 };
+  }
+}
+
+async function acceptLegalDocuments(restaurantID, legalBundle) {
+  return rpc("accept_current_legal_documents", {
+    p_restaurant_id: restaurantID,
+    p_terms_version: legalBundle.termsVersion || 1,
+    p_privacy_version: legalBundle.privacyVersion || 1
+  });
+}
+
+async function requestOwnerEmailVerification(session, setup) {
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/owner-email-verification`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({
+      restaurantId: session.restaurant_id,
+      currentPassword: $("register-password").value,
+      email: setup.email
+    })
+  });
+  return parseResponse(response);
+}
+
+function showRegistrationSuccess(session, emailVerificationSent) {
+  saveLastRestaurant(session.restaurant_id);
+  document.title = "Einrichtung abgeschlossen | Haviko";
+  $("auth-title").textContent = "Einrichtung abgeschlossen";
+  $("auth-subtitle").textContent = "Speichere deine Restaurantkennung und bestätige deine E-Mail-Adresse.";
+  $("register-form").innerHTML = `
+    <div class="empty-state">
+      <img class="empty-mark" src="./assets/haviko-app-icon.png" alt="">
+      <h2>${escapeHTML(session.restaurant_name)}</h2>
+      <p>Deine Restaurantkennung lautet:</p>
+      <div class="code-card"><strong>${escapeHTML(session.restaurant_code)}</strong></div>
+      <p>${emailVerificationSent
+        ? "Der Bestätigungslink wurde an deine Recovery-E-Mail gesendet."
+        : "Die E-Mail-Bestätigung konnte gerade nicht gesendet werden. Du kannst sie später in den Kontoeinstellungen erneut anfordern."}</p>
+      <button class="primary full" type="button" id="registration-dashboard-button">Dashboard öffnen</button>
+    </div>
+  `;
+  $("registration-dashboard-button").addEventListener("click", () => {
+    window.location.assign(DASHBOARD_URL);
+  });
+}
+
 async function loadWorkspace(restaurantID = null) {
+  if (app.isLoggingOut) return;
   setSyncState("saving", "Wird geladen");
   const result = await rpc("web_get_restaurant_workspace", {
     p_restaurant_id: restaurantID
   });
+  if (app.isLoggingOut) return;
   if (!result?.restaurantId) throw new Error("Kein Restaurantzugang gefunden.");
   app.workspace = result;
   app.data = normalizeState(result.state);
   app.updatedAt = result.updatedAt;
-  localStorage.setItem(LAST_RESTAURANT_KEY, result.restaurantId);
+  saveLastRestaurant(result.restaurantId);
+  if (IS_LOGIN_HOST) {
+    window.location.replace(DASHBOARD_URL);
+    return;
+  }
   showWorkspace();
   setSyncState("ready", "Aktuell");
 }
@@ -633,12 +786,16 @@ function toast(title, message, type = "success") {
 
 function showAuth() {
   document.title = "Anmelden | Haviko";
+  document.body.classList.remove("is-booting");
+  $("boot-shell")?.classList.add("hidden");
   $("auth-shell").classList.remove("hidden");
   $("app-shell").classList.add("hidden");
 }
 
 function showWorkspace() {
   document.title = "Dashboard | Haviko";
+  document.body.classList.remove("is-booting");
+  $("boot-shell")?.classList.add("hidden");
   $("auth-shell").classList.add("hidden");
   $("app-shell").classList.remove("hidden");
   $("restaurant-name").textContent = app.data.restaurantName;
@@ -817,7 +974,7 @@ function quickAction(route, title, subtitle, symbol) {
 function emptyHTML(title, text) {
   return `
     <div class="empty-state">
-      <img class="empty-mark" src="../assets/haviko-app-icon.png" alt="">
+      <img class="empty-mark" src="./assets/haviko-app-icon.png" alt="">
       <h2>${escapeHTML(title)}</h2>
       <p>${escapeHTML(text)}</p>
     </div>
@@ -2719,9 +2876,17 @@ async function register(event) {
   const error = $("register-error");
   error.classList.add("hidden");
   button.disabled = true;
-  button.textContent = "Restaurant wird erstellt …";
+  button.textContent = "Einrichtung wird erstellt …";
   try {
+    if (!$("register-terms").checked || !$("register-privacy").checked) {
+      throw new Error("Bitte bestätige Nutzungsbedingungen und Datenschutzerklärung.");
+    }
+    const setup = registrationSetup();
+    if (!setup.email || !$("register-email").checkValidity()) {
+      throw new Error("Bitte gib eine gültige Recovery-E-Mail-Adresse ein.");
+    }
     await ensureSession();
+    const legalBundle = await fetchLegalBundle();
     const rows = await rpc("create_restaurant_account", {
       p_restaurant_name: $("register-name").value.trim(),
       p_restaurant_type: $("register-type").value,
@@ -2731,19 +2896,28 @@ async function register(event) {
     });
     const session = Array.isArray(rows) ? rows[0] : rows;
     if (!session?.restaurant_id) throw new Error("Restaurant konnte nicht erstellt werden.");
-    await initializeRestaurantState(session);
-    await loadWorkspace(session.restaurant_id);
-    toast("Restaurant erstellt", `Deine Kennung lautet ${session.restaurant_code}.`, "success");
+    await initializeRestaurantState(session, setup);
+    await acceptLegalDocuments(session.restaurant_id, legalBundle);
+    let emailVerificationSent = false;
+    try {
+      await requestOwnerEmailVerification(session, setup);
+      emailVerificationSent = true;
+    } catch {
+      emailVerificationSent = false;
+    }
+    showRegistrationSuccess(session, emailVerificationSent);
   } catch (caught) {
     error.textContent = friendlyError(caught);
     error.classList.remove("hidden");
   } finally {
     button.disabled = false;
-    button.textContent = "Restaurant sicher erstellen";
+    button.textContent = "Einrichtung abschließen";
   }
 }
 
 async function logout() {
+  if (app.isLoggingOut) return;
+  app.isLoggingOut = true;
   try {
     if (app.session?.access_token) {
       await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
@@ -2753,7 +2927,13 @@ async function logout() {
     }
   } finally {
     clearSession();
-    showAuth();
+    if ($("modal")?.open) closeModal();
+    if (IS_LOGIN_HOST) {
+      showAuth();
+      app.isLoggingOut = false;
+    } else {
+      window.location.replace(LOGIN_URL);
+    }
   }
 }
 
@@ -2788,17 +2968,22 @@ function updateOnlineStatus() {
 }
 
 async function start() {
-  showAuth();
+  if (app.isLoggingOut) return;
   switchAuth(INITIAL_AUTH_MODE);
   try {
-    const stored = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || "null");
-    if (!stored?.access_token && !stored?.refresh_token) return;
+    const stored = readStoredSession();
+    if (!stored?.access_token && !stored?.refresh_token) {
+      if (IS_DASHBOARD_HOST) window.location.replace(LOGIN_URL);
+      else showAuth();
+      return;
+    }
     app.session = stored;
     await ensureSession();
-    await loadWorkspace(localStorage.getItem(LAST_RESTAURANT_KEY));
+    await loadWorkspace(readLastRestaurant());
   } catch {
     clearSession();
-    showAuth();
+    if (IS_DASHBOARD_HOST) window.location.replace(LOGIN_URL);
+    else showAuth();
   }
 }
 
@@ -2834,7 +3019,14 @@ window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
 
 updateOnlineStatus();
-if (!DEVELOPMENT_MODE) {
+if (
+  !DEVELOPMENT_MODE ||
+  readCookie("haviko_preview_access") === "granted"
+) {
   $("development-gate").classList.add("hidden");
   start();
+} else {
+  window.location.replace(
+    `https://autorisieren.haviko.de/?next=${encodeURIComponent(window.location.href)}`
+  );
 }
