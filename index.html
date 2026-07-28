@@ -11,14 +11,13 @@
   <link rel="preconnect" href="https://dlapwemckfhxklytbqkk.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="//dlapwemckfhxklytbqkk.supabase.co">
   <meta name="theme-color" content="#00866a">
-  <link rel="icon" href="./favicon.ico?v=5" sizes="48x48">
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=5">
-  <link rel="icon" type="image/png" sizes="48x48" href="./assets/favicon-48.png?v=5">
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/haviko-icon-192.png?v=5">
-  <link rel="shortcut icon" href="./favicon.ico?v=5">
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=5">
-  <link rel="manifest" href="./site.webmanifest?v=5">
-  <title>Haviko – Restaurantbetrieb einfach organisiert</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=7">
+  <link rel="icon" type="image/png" sizes="48x48" href="./assets/favicon-48.png?v=7">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/haviko-icon-192.png?v=7">
+  <link rel="shortcut icon" type="image/png" href="./assets/favicon-48.png?v=7">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=7">
+  <link rel="manifest" href="./site.webmanifest?v=7">
+  <title>Haviko | Restaurantsoftware</title>
   <style>
     :root {
       color-scheme: light;
@@ -1271,8 +1270,8 @@
             <span>Haviko</span>
           </a>
           <div class="landing-actions">
-            <a class="landing-login" href="./dashboard/">Anmelden</a>
-            <a class="landing-register" href="./dashboard/?mode=register">Restaurant erstellen</a>
+            <a class="landing-login" href="https://login.haviko.de/">Anmelden</a>
+            <a class="landing-register" href="https://login.haviko.de/?mode=register">Restaurant erstellen</a>
           </div>
         </div>
       </nav>
@@ -1286,8 +1285,8 @@
             und Auswertungen in einem gemeinsamen Arbeitsbereich.
           </p>
           <div class="landing-hero-actions">
-            <a class="primary-link" href="./dashboard/">Bei Haviko anmelden</a>
-            <a class="secondary-link" href="./dashboard/?mode=register">Restaurant erstellen</a>
+            <a class="primary-link" href="https://login.haviko.de/">Bei Haviko anmelden</a>
+            <a class="secondary-link" href="https://login.haviko.de/?mode=register">Restaurant erstellen</a>
           </div>
         </div>
       </section>
@@ -1634,7 +1633,7 @@
           Sichere Restaurantorganisation und Online-Reservierungen.
         </div>
         <div class="footer-links">
-          <a href="./dashboard/">Haviko Web</a>
+          <a href="https://login.haviko.de/">Haviko Web</a>
           <button type="button" data-legal="support">Support</button>
           <button type="button" data-legal="veroeffentlichung">Veröffentlichung</button>
           <button type="button" data-legal="impressum">Impressum</button>
@@ -2124,13 +2123,20 @@
       const SUPABASE_KEY = "sb_publishable_VeeQLARNn-sULZ4snvp3HA_Hd78H5RN";
       const DEVELOPMENT_MODE = true;
       const DEVELOPMENT_PIN_HASH =
-        "5f20b9b81da6a3163f1cc96b603868330378255157dae99d8a6d7cc5fa3d6a19";
+        "763f0a51a8e57db6ca611f045f3c5acc85075b79cedebf010f0d2277fb966c3e";
       const params = new URLSearchParams(window.location.search);
       const publicID = params.get("r");
       const cancellationToken = params.get("cancel");
       const reviewCode = params.get("review");
       const requestedLegalDocument = window.location.hash.slice(1);
       const hasPublicRoute = Boolean(publicID || cancellationToken || reviewCode);
+      document.title = reviewCode
+        ? "Bewertung | Haviko"
+        : cancellationToken
+          ? "Reservierung verwalten | Haviko"
+          : publicID
+            ? "Tisch reservieren | Haviko"
+            : "Haviko | Restaurantsoftware";
       let siteStarted = false;
       let previewUnlocked = false;
 
@@ -2906,7 +2912,7 @@
       async function start() {
         if (!hasPublicRoute) {
           if (!requestedLegalDocument && hasStoredDashboardSession()) {
-            window.location.replace("./dashboard/");
+            window.location.replace("https://login.haviko.de/");
             return;
           }
           showLandingPage();

@@ -48,7 +48,7 @@ PIN-Eingabe.
 5. In Haviko unter `Online-Reservierung` die Funktion aktivieren und speichern.
 
 Das Dashboard ist anschließend unter
-`https://allendogan060.github.io/dashboard/` erreichbar. Restaurantleitung,
+`https://login.haviko.de/` erreichbar. Restaurantleitung,
 Management, Service, Küche und Bar verwenden Restaurantkennung, ihren Namen
 und ihr persönliches Passwort. Die Restaurantleitung kann Mitarbeiter,
 individuelle Rechte und Gerätezugänge im Web-Dashboard verwalten. Geräte selbst
