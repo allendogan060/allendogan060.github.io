@@ -340,6 +340,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--action); box-sha
 }
 
 .workspace-header h1 { margin: 0; font-size: 25px; }
+.workspace-header-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.header-brand-mark { display: none; width: 32px; height: 32px; border-radius: 9px; flex: 0 0 auto; }
 .header-actions {
   min-width: 0;
   display: flex;
@@ -729,6 +731,7 @@ dialog::backdrop { background: rgba(7,28,23,0.52); backdrop-filter: blur(3px); }
   .workspace-header > div:first-child { min-width: 0; }
   .workspace-header h1 { font-size: 21px; }
   .workspace-header .eyebrow { display: none; }
+  .header-brand-mark { display: block; }
   .sync-state span, .restaurant-switch { display: none; }
   .view { padding: 16px 13px 24px; }
   .page-tools { align-items: stretch; flex-direction: column; }
