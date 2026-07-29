@@ -31,7 +31,7 @@
       }
     })();
   </script>
-  <title>Haviko | Restaurantsoftware</title>
+  <title>Haviko - Restaurantsoftware</title>
   <style>
     :root {
       color-scheme: light;
@@ -1208,10 +1208,10 @@
         justify-content: space-between;
       }
       .summary-head::after {
-        content: "⌄";
+        content: "Mehr";
         font-size: 22px;
       }
-      .summary-panel.expanded .summary-head::after { content: "⌃"; }
+      .summary-panel.expanded .summary-head::after { content: "Weniger"; }
       .step-actions { align-items: stretch; }
       .step-actions .primary { min-width: 0; flex: 1; }
       .confirmation { padding: 28px 18px; }
@@ -1572,7 +1572,6 @@
       </form>
 
       <section class="confirmation hidden" id="confirmation" aria-live="polite">
-        <div class="confirmation-mark" aria-hidden="true">✓</div>
         <h2 id="confirmation-title">Reservierung eingegangen</h2>
         <div class="confirmation-code" id="confirmation-code"></div>
         <p id="confirmation-message"></p>
@@ -1585,7 +1584,6 @@
       </section>
 
       <section class="confirmation hidden" id="cancellation-manager" aria-live="polite">
-        <div class="confirmation-mark" aria-hidden="true">i</div>
         <h2 id="cancellation-title">Reservierung verwalten</h2>
         <div class="confirmation-code" id="cancellation-code"></div>
         <div class="review-block">
@@ -1601,7 +1599,6 @@
       </section>
 
       <section class="confirmation hidden" id="review-manager" aria-live="polite">
-        <div class="confirmation-mark" aria-hidden="true">★</div>
         <h2 id="review-title">Wie war dein Besuch?</h2>
         <div class="confirmation-code" id="review-code"></div>
         <p>Deine Rückmeldung geht direkt an das Restaurant.</p>
@@ -1648,6 +1645,8 @@
         </div>
         <div class="footer-links">
           <a href="https://login.haviko.de/">Haviko Web</a>
+          <a href="https://gastportal.haviko.de/">Gastportal</a>
+          <a href="https://status.haviko.de/">Systemstatus</a>
           <button type="button" data-legal="support">Support</button>
           <button type="button" data-legal="veroeffentlichung">Veröffentlichung</button>
           <button type="button" data-legal="impressum">Impressum</button>
@@ -2145,12 +2144,12 @@
       const requestedLegalDocument = window.location.hash.slice(1);
       const hasPublicRoute = Boolean(publicID || cancellationToken || reviewCode);
       document.title = reviewCode
-        ? "Bewertung | Haviko"
+        ? "Bewertung - Haviko"
         : cancellationToken
-          ? "Reservierung verwalten | Haviko"
+          ? "Reservierung verwalten - Haviko"
           : publicID
-            ? "Tisch reservieren | Haviko"
-            : "Haviko | Restaurantsoftware";
+            ? "Tisch reservieren - Haviko"
+            : "Haviko - Restaurantsoftware";
       let siteStarted = false;
       let previewUnlocked = false;
 
