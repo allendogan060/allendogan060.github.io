@@ -31,7 +31,7 @@
       }
     })();
   </script>
-  <title>Haviko - Restaurantsoftware</title>
+  <title>Haviko | Restaurantsoftware</title>
   <style>
     :root {
       color-scheme: light;
@@ -348,7 +348,7 @@
 
     .landing-feature-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -383,171 +383,6 @@
       margin: 0;
       color: var(--muted);
       line-height: 1.55;
-    }
-
-    .landing-more {
-      padding: 64px 22px 78px;
-      background: var(--soft, #f4f7f6);
-    }
-
-    .landing-more-inner {
-      width: min(100%, var(--content));
-      margin: 0 auto;
-    }
-
-    .landing-more h2 {
-      max-width: 650px;
-      margin: 0 0 30px;
-      font-size: clamp(28px, 4.6vw, 40px);
-      line-height: 1.1;
-    }
-
-    .landing-more .landing-kicker { color: var(--action); }
-
-    .landing-more-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .landing-more-item {
-      display: flex;
-      gap: 14px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: white;
-    }
-
-    .landing-more-item .mark {
-      flex: 0 0 auto;
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border-radius: 9px;
-      background: var(--action-soft);
-      color: var(--action);
-      font-weight: 850;
-      font-size: 15px;
-    }
-
-    .landing-more-item h3 {
-      margin: 0 0 5px;
-      font-size: 16px;
-    }
-
-    .landing-more-item p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .landing-plans {
-      padding: 64px 22px 84px;
-      background: white;
-    }
-
-    .landing-plans-inner {
-      width: min(100%, var(--content));
-      margin: 0 auto;
-    }
-
-    .landing-plans h2 {
-      max-width: 650px;
-      margin: 0 0 12px;
-      font-size: clamp(28px, 4.6vw, 40px);
-      line-height: 1.1;
-    }
-
-    .landing-plans .landing-kicker { color: var(--action); }
-
-    .landing-plans-lead {
-      max-width: 620px;
-      margin: 0 0 34px;
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.55;
-    }
-
-    .landing-plan-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .landing-plan {
-      padding: 30px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: white;
-    }
-
-    .landing-plan.is-plus {
-      border-color: var(--action);
-      background: linear-gradient(180deg, var(--action-soft), white 60%);
-    }
-
-    .landing-plan-name {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      color: var(--action);
-    }
-
-    .landing-plan-price {
-      margin: 14px 0 4px;
-      font-size: 32px;
-      font-weight: 850;
-    }
-
-    .landing-plan-price small {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
-    .landing-plan-note {
-      margin: 0 0 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .landing-plan-list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 10px;
-    }
-
-    .landing-plan-list li {
-      padding-left: 22px;
-      position: relative;
-      font-size: 14.5px;
-      line-height: 1.5;
-      color: var(--ink, #16211c);
-    }
-
-    .landing-plan-list li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 7px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--action);
-    }
-
-    @media (max-width: 760px) {
-      .landing-more-grid { grid-template-columns: 1fr; }
-      .landing-plan-grid { grid-template-columns: 1fr; }
     }
 
     .hero {
@@ -621,6 +456,92 @@
       font-size: 17px;
       line-height: 1.48;
     }
+
+    .hero-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-quick-button {
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hero-quick-button-round {
+      width: 32px;
+      min-height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      font-style: italic;
+      font-family: Georgia, serif;
+    }
+
+    .hero-quick-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 60px 18px;
+      background: rgba(6, 30, 24, 0.5);
+    }
+
+    .hero-quick-panel-inner {
+      position: relative;
+      width: min(100%, 480px);
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 26px 24px;
+      border-radius: 18px;
+      background: var(--surface, #fff);
+      color: var(--ink, #14211d);
+      box-shadow: 0 24px 60px rgba(6, 30, 24, 0.3);
+    }
+
+    .hero-quick-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.06);
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .menu-list { display: grid; gap: 22px; }
+    .menu-category-title {
+      margin: 0 0 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--action, #087966);
+      color: var(--forest-deep, #063c32);
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .menu-items { display: grid; gap: 10px; }
+    .menu-item { display: flex; align-items: baseline; gap: 8px; }
+    .menu-item-name { color: var(--ink, #14211d); font-size: 15px; font-weight: 600; }
+    .menu-item-dots {
+      flex: 1;
+      border-bottom: 1px dotted var(--line, #d9e4e0);
+      transform: translateY(-4px);
+      min-width: 12px;
+    }
+    .menu-item-price { color: var(--forest-deep, #063c32); font-size: 15px; font-weight: 700; white-space: nowrap; }
 
     .stepbar {
       border-bottom: 1px solid var(--line);
@@ -1449,6 +1370,7 @@
             <span>Haviko</span>
           </a>
           <div class="landing-actions">
+            <a class="landing-login" href="https://gastportal.haviko.de/">Gastportal</a>
             <a class="landing-login" href="https://login.haviko.de/">Anmelden</a>
             <a class="landing-register" href="https://login.haviko.de/?mode=register">Restaurant erstellen</a>
           </div>
@@ -1490,73 +1412,11 @@
               <h3>Team und Betrieb</h3>
               <p>Schichten, Rollen und betriebliche Kennzahlen bleiben zentral organisiert.</p>
             </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="landing-more">
-        <div class="landing-more-inner">
-          <p class="landing-kicker">Mehr als eine Kasse</p>
-          <h2>Was in Haviko steckt.</h2>
-          <div class="landing-more-grid">
-            <div class="landing-more-item">
-              <span class="mark" aria-hidden="true">✓</span>
-              <div><h3>Online-Reservierung</h3><p>Gäste buchen direkt über eine eigene Seite, inklusive Warteliste und automatischer Bestätigung.</p></div>
-            </div>
-            <div class="landing-more-item">
-              <span class="mark" aria-hidden="true">✓</span>
-              <div><h3>Gastportal</h3><p>Gäste sehen ihre Reservierungen, digitalen Rechnungen und ihre Stempelkarte an einem sicheren Ort, nur mit ihrer E-Mail-Adresse.</p></div>
-            </div>
-            <div class="landing-more-item">
-              <span class="mark" aria-hidden="true">✓</span>
-              <div><h3>Kundenbindungsprogramm</h3><p>Digitale Stempelkarte mit frei wählbarer Prämie: Gutschein, Rabatt oder Gratisprodukt.</p></div>
-            </div>
-            <div class="landing-more-item">
-              <span class="mark" aria-hidden="true">✓</span>
-              <div><h3>Tisch-QR-Codes</h3><p>Jeder Tisch bekommt einen eigenen QR-Code für die Speisekarte, ganz ohne Reservierungsdaten preiszugeben.</p></div>
-            </div>
-            <div class="landing-more-item">
-              <span class="mark" aria-hidden="true">✓</span>
-              <div><h3>Digitale Rechnungen</h3><p>Beleg per QR-Code öffnen, speichern und optional direkt Trinkgeld geben.</p></div>
-            </div>
-            <div class="landing-more-item">
-              <span class="mark" aria-hidden="true">✓</span>
-              <div><h3>Kassenführung</h3><p>Kassenbuch mit Kassentag, Einlagen und Entnahmen sowie lückenloser Belegnummerierung.</p></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="landing-plans">
-        <div class="landing-plans-inner">
-          <p class="landing-kicker">Preise</p>
-          <h2>Kostenlos starten, bei Bedarf erweitern.</h2>
-          <p class="landing-plans-lead">Haviko läuft im Kern komplett kostenlos. Haviko+ lohnt sich erst, wenn dein Betrieb über die kostenlosen Grenzen hinauswächst oder du erweiterte Auswertungen brauchst.</p>
-          <div class="landing-plan-grid">
-            <div class="landing-plan">
-              <span class="landing-plan-name">Kostenlos</span>
-              <p class="landing-plan-price">0&nbsp;€ <small>/ Monat</small></p>
-              <p class="landing-plan-note">Für den täglichen Betrieb, ohne Zeitlimit.</p>
-              <ul class="landing-plan-list">
-                <li>Reservierungen, Tische und Bestellungen</li>
-                <li>Online-Reservierung, Gastportal und Kundenbindung</li>
-                <li>Bis zu 3 Mitarbeiter, davon 2 im Service und 1 in der Küche</li>
-                <li>1 Station und 1 digitales Gerät</li>
-                <li>Kassenbuch und digitale Rechnungen</li>
-              </ul>
-            </div>
-            <div class="landing-plan is-plus">
-              <span class="landing-plan-name">Haviko+</span>
-              <p class="landing-plan-price">Auf Anfrage</p>
-              <p class="landing-plan-note">Für wachsende Betriebe mit mehr Team und mehr Auswertungen.</p>
-              <ul class="landing-plan-list">
-                <li>Mehr Mitarbeiter, Service- und Küchenkräfte</li>
-                <li>Mehr Stationen und digitale Geräte</li>
-                <li>Umsatz-, Produkt-, Mitarbeiter-, Schicht- und Reservierungsanalysen</li>
-                <li>Datenexport</li>
-                <li>Eigene Gutscheincodes und Gutschein-Gestaltung</li>
-              </ul>
-            </div>
+            <article class="landing-feature">
+              <span class="landing-feature-mark" aria-hidden="true">4</span>
+              <h3>Gastportal</h3>
+              <p>Gäste öffnen Reservierungen, digitale Rechnungen, Feedback und Stempelkarten über persönliche Links.</p>
+            </article>
           </div>
         </div>
       </section>
@@ -1567,13 +1427,25 @@
         <img class="restaurant-logo hidden" id="logo" alt="">
         <div>
           <p class="eyebrow">Online-Reservierung</p>
-          <h1 id="restaurant-name">Haviko</h1>
+          <div class="hero-title-row">
+            <h1 id="restaurant-name">Haviko</h1>
+            <button class="hero-quick-button hidden" type="button" id="hero-menu-button" aria-label="Speisekarte anzeigen">Karte</button>
+            <button class="hero-quick-button hero-quick-button-round hidden" type="button" id="hero-info-button" aria-label="Informationen zum Restaurant">i</button>
+          </div>
           <p class="hero-subtitle" id="restaurant-description">
             Freie Zeiten werden für dich geladen.
           </p>
         </div>
       </div>
     </header>
+
+    <div class="hero-quick-panel hidden" id="hero-quick-panel">
+      <div class="hero-quick-panel-inner">
+        <button class="hero-quick-close" type="button" id="hero-quick-close" aria-label="Schließen">×</button>
+        <h2 id="hero-quick-panel-title"></h2>
+        <div id="hero-quick-panel-body"></div>
+      </div>
+    </div>
 
     <nav class="stepbar hidden" id="stepbar" aria-label="Reservierungsschritte">
       <ol>
@@ -1800,6 +1672,7 @@
             </dl>
           </div>
           <div class="restaurant-info" id="restaurant-info"></div>
+          <div class="restaurant-info hidden" id="public-menu"></div>
         </aside>
       </form>
 
@@ -1867,6 +1740,29 @@
           Danke. Deine Bewertung wurde sicher übermittelt.
         </div>
       </section>
+
+      <section class="confirmation hidden" id="receipt-viewer" aria-live="polite">
+        <h2 id="receipt-restaurant-name">Digitale Rechnung</h2>
+        <div class="confirmation-code" id="receipt-invoice-number"></div>
+        <dl class="summary-list" id="receipt-items"></dl>
+        <div class="summary-row receipt-total"><dt>Gesamt</dt><dd id="receipt-total"></dd></div>
+        <p class="field-hint" id="receipt-meta"></p>
+        <div class="confirmation-actions">
+          <a class="primary hidden" id="receipt-tip-link" href="#" target="_blank" rel="noopener">Trinkgeld geben</a>
+          <button class="secondary" type="button" id="receipt-back">Zur Reservierungsseite</button>
+        </div>
+      </section>
+
+      <section class="confirmation hidden" id="table-viewer" aria-live="polite">
+        <h2 id="table-restaurant-name">Restaurant</h2>
+        <div class="confirmation-code" id="table-name"></div>
+        <div class="restaurant-info" id="table-restaurant-info"></div>
+        <div class="restaurant-info" id="table-menu"></div>
+        <p class="field-hint">Diese Seite zeigt nur die Speisekarte. Bestellungen nimmt das Personal am Tisch entgegen.</p>
+        <div class="confirmation-actions">
+          <button class="secondary" type="button" id="table-back">Zur Reservierungsseite</button>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
@@ -1877,8 +1773,6 @@
         </div>
         <div class="footer-links">
           <a href="https://login.haviko.de/">Haviko Web</a>
-          <a href="https://gastportal.haviko.de/">Gastportal</a>
-          <a href="https://status.haviko.de/">Systemstatus</a>
           <button type="button" data-legal="support">Support</button>
           <button type="button" data-legal="veroeffentlichung">Veröffentlichung</button>
           <button type="button" data-legal="impressum">Impressum</button>
@@ -2373,15 +2267,21 @@
       const publicID = params.get("r");
       const cancellationToken = params.get("cancel");
       const reviewCode = params.get("review");
+      const receiptToken = params.get("receipt");
+      const tableID = params.get("table");
       const requestedLegalDocument = window.location.hash.slice(1);
-      const hasPublicRoute = Boolean(publicID || cancellationToken || reviewCode);
-      document.title = reviewCode
-        ? "Bewertung - Haviko"
-        : cancellationToken
-          ? "Reservierung verwalten - Haviko"
-          : publicID
-            ? "Tisch reservieren - Haviko"
-            : "Haviko - Restaurantsoftware";
+      const hasPublicRoute = Boolean(publicID || cancellationToken || reviewCode || receiptToken || tableID);
+      document.title = tableID
+        ? "Speisekarte - Haviko"
+        : receiptToken
+        ? "Digitale Rechnung - Haviko"
+        : reviewCode
+          ? "Bewertung - Haviko"
+          : cancellationToken
+            ? "Reservierung verwalten - Haviko"
+            : publicID
+              ? "Tisch reservieren - Haviko"
+              : "Haviko | Restaurantsoftware";
       let siteStarted = false;
       let previewUnlocked = false;
 
@@ -2395,6 +2295,7 @@
         cancellationToken: null,
         reviewCode: reviewCode || ""
       };
+      const heroQuickContent = { menu: "", info: "" };
 
       const $ = (id) => document.getElementById(id);
       const form = $("booking-form");
@@ -2840,27 +2741,25 @@
           return;
         }
 
-        const info = [];
-        if (restaurant.address) {
-          info.push(`<div><strong>Adresse</strong><br>${escapeHTML(restaurant.address)}</div>`);
-        }
-        if (restaurant.openingHoursText) {
-          info.push(`<div><strong>Öffnungszeiten</strong><br>${escapeHTML(restaurant.openingHoursText)}</div>`);
-        }
-        if (restaurant.phone) {
-          info.push(
-            `<div><strong>Telefon</strong><br>` +
-            `<a href="tel:${encodeURIComponent(restaurant.phone)}">${escapeHTML(restaurant.phone)}</a></div>`
-          );
-        }
-        if (restaurant.email) {
-          info.push(
-            `<div><strong>E-Mail</strong><br>` +
-            `<a href="mailto:${encodeURIComponent(restaurant.email)}">${escapeHTML(restaurant.email)}</a></div>`
-          );
-        }
+        const info = buildRestaurantInfoParts(restaurant, snapshot);
         $("restaurant-info").innerHTML = info.join("");
         $("restaurant-info").classList.toggle("hidden", info.length === 0);
+
+        const menu = snapshot?.menu || [];
+        if (menu.length) {
+          $("public-menu").innerHTML = `<div><strong>Speisekarte</strong></div>${renderMenuHTML(menu)}`;
+          $("public-menu").classList.remove("hidden");
+        } else {
+          $("public-menu").classList.add("hidden");
+        }
+
+        heroQuickContent.menu = menu.length ? renderMenuHTML(menu) : "";
+        heroQuickContent.info = [
+          `<div><strong>Über ${escapeHTML(restaurant.name || "das Restaurant")}</strong><br>${escapeHTML(restaurant.description || "Informationen zu deinem Besuch und Kontaktmöglichkeiten findest du hier.")}</div>`,
+          ...info
+        ].join("");
+        $("hero-menu-button").classList.toggle("hidden", !heroQuickContent.menu);
+        $("hero-info-button").classList.remove("hidden");
 
         applyFieldRules();
         renderSlots();
@@ -3064,6 +2963,136 @@
         }
       }
 
+      function buildRestaurantInfoParts(restaurant, snapshot) {
+        const info = [];
+        if (restaurant.address) {
+          info.push(`<div><strong>Adresse</strong><br>${escapeHTML(restaurant.address)}</div>`);
+        }
+        if (restaurant.openingHoursText) {
+          info.push(`<div><strong>Öffnungszeiten</strong><br>${escapeHTML(restaurant.openingHoursText)}</div>`);
+        }
+        if (restaurant.phone) {
+          info.push(
+            `<div><strong>Telefon</strong><br>` +
+            `<a href="tel:${encodeURIComponent(restaurant.phone)}">${escapeHTML(restaurant.phone)}</a></div>`
+          );
+        }
+        if (restaurant.email) {
+          info.push(
+            `<div><strong>E-Mail</strong><br>` +
+            `<a href="mailto:${encodeURIComponent(restaurant.email)}">${escapeHTML(restaurant.email)}</a></div>`
+          );
+        }
+        const loyalty = snapshot?.loyaltyConfiguration;
+        if (loyalty?.enabled) {
+          info.push(
+            `<div><strong>Kundenbindungsprogramm</strong><br>Bei jedem ${escapeHTML(String(loyalty.visitsRequired))}. Besuch: ${escapeHTML(loyalty.rewardDescription || "eine Belohnung")}</div>`
+          );
+        }
+        return info;
+      }
+
+      function renderMenuHTML(menu) {
+        const byCategory = new Map();
+        menu.forEach((item) => {
+          const list = byCategory.get(item.category) || [];
+          list.push(item);
+          byCategory.set(item.category, list);
+        });
+        const formatPrice = (value) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(Number(value || 0));
+        return `<div class="menu-list">${[...byCategory.entries()].map(([category, items]) => `
+          <div class="menu-category">
+            <h3 class="menu-category-title">${escapeHTML(category || "Speisen")}</h3>
+            <div class="menu-items">
+              ${items.map((item) => `
+                <div class="menu-item">
+                  <span class="menu-item-name">${escapeHTML(item.name)}</span>
+                  <span class="menu-item-dots"></span>
+                  <span class="menu-item-price">${formatPrice(item.price)}</span>
+                </div>`).join("")}
+            </div>
+          </div>`).join("")}</div>`;
+      }
+
+      async function loadTableView(publicIDValue, tableIDValue) {
+        $("loading").classList.remove("hidden");
+        try {
+          const snapshot = await rpc("get_public_booking_snapshot", { p_public_id: publicIDValue });
+          const table = (snapshot?.tables || []).find((item) => item.id === tableIDValue);
+          $("loading").classList.add("hidden");
+          $("fatal").classList.add("hidden");
+          form.classList.add("hidden");
+          $("stepbar").classList.add("hidden");
+          $("confirmation").classList.add("hidden");
+          $("cancellation-manager").classList.add("hidden");
+          $("review-manager").classList.add("hidden");
+          $("receipt-viewer").classList.add("hidden");
+          $("table-viewer").classList.remove("hidden");
+          $("table-restaurant-name").textContent = snapshot?.restaurant?.name || "Restaurant";
+          $("table-name").textContent = table ? table.name : "Tisch";
+          const restaurantInfo = buildRestaurantInfoParts(snapshot?.restaurant || {}, snapshot);
+          $("table-restaurant-info").innerHTML = restaurantInfo.join("");
+          $("table-restaurant-info").classList.toggle("hidden", restaurantInfo.length === 0);
+          const menu = snapshot?.menu || [];
+          $("table-menu").innerHTML = menu.length
+            ? renderMenuHTML(menu)
+            : `<div>Die Speisekarte ist online noch nicht verfügbar.</div>`;
+          $("table-menu").classList.remove("hidden");
+        } catch (error) {
+          showFatal(
+            "Die Speisekarte konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+            "Verbindung fehlgeschlagen"
+          );
+        }
+      }
+
+      function formatEUR(amount) {
+        return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" })
+          .format(Number(amount || 0));
+      }
+
+      async function loadReceipt(token) {
+        $("loading").classList.remove("hidden");
+        try {
+          const receipt = await rpc("get_public_receipt", { p_token: token });
+          if (!receipt) {
+            showFatal("Diese Rechnung wurde nicht gefunden oder ist abgelaufen.", "Rechnung nicht verfügbar");
+            return;
+          }
+          $("loading").classList.add("hidden");
+          $("fatal").classList.add("hidden");
+          form.classList.add("hidden");
+          $("stepbar").classList.add("hidden");
+          $("confirmation").classList.add("hidden");
+          $("cancellation-manager").classList.add("hidden");
+          $("review-manager").classList.add("hidden");
+          $("receipt-viewer").classList.remove("hidden");
+          $("receipt-restaurant-name").textContent = receipt.restaurantName || "Digitale Rechnung";
+          $("receipt-invoice-number").textContent = receipt.invoiceNumber || "";
+          $("receipt-items").innerHTML = (receipt.items || []).map((item) => `
+            <div class="summary-row">
+              <dt>${escapeHTML(String(item.quantity ?? 1))}× ${escapeHTML(item.name || "")}</dt>
+              <dd>${formatEUR((item.unitPrice ?? 0) * (item.quantity ?? 1))}</dd>
+            </div>`).join("");
+          $("receipt-total").textContent = formatEUR(receipt.grossAmount);
+          $("receipt-meta").textContent = [receipt.paymentMethodName, receipt.sourceName]
+            .filter(Boolean)
+            .join(" · ");
+          const tipLink = $("receipt-tip-link");
+          if (receipt.tipLinkURL) {
+            tipLink.href = receipt.tipLinkURL;
+            tipLink.classList.remove("hidden");
+          } else {
+            tipLink.classList.add("hidden");
+          }
+        } catch (error) {
+          showFatal(
+            "Die Rechnung konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+            "Verbindung fehlgeschlagen"
+          );
+        }
+      }
+
       function openReview(code) {
         state.reviewCode = String(code || "").trim().toUpperCase();
         $("loading").classList.add("hidden");
@@ -3169,6 +3198,14 @@
           showLandingPage();
           return;
         }
+        if (receiptToken && /^[0-9a-f-]{36}$/i.test(receiptToken)) {
+          await loadReceipt(receiptToken);
+          return;
+        }
+        if (tableID && publicID && /^[0-9a-f-]{36}$/i.test(tableID) && /^[0-9a-f-]{36}$/i.test(publicID)) {
+          await loadTableView(publicID, tableID);
+          return;
+        }
         if (reviewCode && /^SVR-[A-Z0-9]{6}$/i.test(reviewCode)) {
           openReview(reviewCode);
           return;
@@ -3234,6 +3271,29 @@
       });
       $("cancel-reservation").addEventListener("click", cancelReservation);
       $("review-visit").addEventListener("click", () => openReview(state.reviewCode));
+      $("receipt-back").addEventListener("click", () => {
+        window.location.href = window.location.pathname;
+      });
+      $("table-back").addEventListener("click", () => {
+        window.location.href = `${window.location.pathname}?r=${encodeURIComponent(publicID || "")}`;
+      });
+      function openHeroQuickPanel(title, html) {
+        $("hero-quick-panel-title").textContent = title;
+        $("hero-quick-panel-body").innerHTML = html;
+        $("hero-quick-panel").classList.remove("hidden");
+      }
+      $("hero-menu-button").addEventListener("click", () => {
+        if (heroQuickContent.menu) openHeroQuickPanel("Speisekarte", heroQuickContent.menu);
+      });
+      $("hero-info-button").addEventListener("click", () => {
+        if (heroQuickContent.info) openHeroQuickPanel("Über das Restaurant", heroQuickContent.info);
+      });
+      $("hero-quick-close").addEventListener("click", () => {
+        $("hero-quick-panel").classList.add("hidden");
+      });
+      $("hero-quick-panel").addEventListener("click", (event) => {
+        if (event.target.id === "hero-quick-panel") $("hero-quick-panel").classList.add("hidden");
+      });
       $("review-form").addEventListener("submit", submitReview);
       $("review-back").addEventListener("click", () => {
         if (cancellationToken) {
