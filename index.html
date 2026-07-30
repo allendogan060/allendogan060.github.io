@@ -385,6 +385,171 @@
       line-height: 1.55;
     }
 
+    .landing-more {
+      padding: 64px 22px 78px;
+      background: var(--soft, #f4f7f6);
+    }
+
+    .landing-more-inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+    }
+
+    .landing-more h2 {
+      max-width: 650px;
+      margin: 0 0 30px;
+      font-size: clamp(28px, 4.6vw, 40px);
+      line-height: 1.1;
+    }
+
+    .landing-more .landing-kicker { color: var(--action); }
+
+    .landing-more-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .landing-more-item {
+      display: flex;
+      gap: 14px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .landing-more-item .mark {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--action-soft);
+      color: var(--action);
+      font-weight: 850;
+      font-size: 15px;
+    }
+
+    .landing-more-item h3 {
+      margin: 0 0 5px;
+      font-size: 16px;
+    }
+
+    .landing-more-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .landing-plans {
+      padding: 64px 22px 84px;
+      background: white;
+    }
+
+    .landing-plans-inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+    }
+
+    .landing-plans h2 {
+      max-width: 650px;
+      margin: 0 0 12px;
+      font-size: clamp(28px, 4.6vw, 40px);
+      line-height: 1.1;
+    }
+
+    .landing-plans .landing-kicker { color: var(--action); }
+
+    .landing-plans-lead {
+      max-width: 620px;
+      margin: 0 0 34px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .landing-plan-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .landing-plan {
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+    }
+
+    .landing-plan.is-plus {
+      border-color: var(--action);
+      background: linear-gradient(180deg, var(--action-soft), white 60%);
+    }
+
+    .landing-plan-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--action);
+    }
+
+    .landing-plan-price {
+      margin: 14px 0 4px;
+      font-size: 32px;
+      font-weight: 850;
+    }
+
+    .landing-plan-price small {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .landing-plan-note {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .landing-plan-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .landing-plan-list li {
+      padding-left: 22px;
+      position: relative;
+      font-size: 14.5px;
+      line-height: 1.5;
+      color: var(--ink, #16211c);
+    }
+
+    .landing-plan-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--action);
+    }
+
+    @media (max-width: 760px) {
+      .landing-more-grid { grid-template-columns: 1fr; }
+      .landing-plan-grid { grid-template-columns: 1fr; }
+    }
+
     .hero {
       min-height: 285px;
       position: relative;
@@ -1325,6 +1490,73 @@
               <h3>Team und Betrieb</h3>
               <p>Schichten, Rollen und betriebliche Kennzahlen bleiben zentral organisiert.</p>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-more">
+        <div class="landing-more-inner">
+          <p class="landing-kicker">Mehr als eine Kasse</p>
+          <h2>Was in Haviko steckt.</h2>
+          <div class="landing-more-grid">
+            <div class="landing-more-item">
+              <span class="mark" aria-hidden="true">✓</span>
+              <div><h3>Online-Reservierung</h3><p>Gäste buchen direkt über eine eigene Seite, inklusive Warteliste und automatischer Bestätigung.</p></div>
+            </div>
+            <div class="landing-more-item">
+              <span class="mark" aria-hidden="true">✓</span>
+              <div><h3>Gastportal</h3><p>Gäste sehen ihre Reservierungen, digitalen Rechnungen und ihre Stempelkarte an einem sicheren Ort, nur mit ihrer E-Mail-Adresse.</p></div>
+            </div>
+            <div class="landing-more-item">
+              <span class="mark" aria-hidden="true">✓</span>
+              <div><h3>Kundenbindungsprogramm</h3><p>Digitale Stempelkarte mit frei wählbarer Prämie: Gutschein, Rabatt oder Gratisprodukt.</p></div>
+            </div>
+            <div class="landing-more-item">
+              <span class="mark" aria-hidden="true">✓</span>
+              <div><h3>Tisch-QR-Codes</h3><p>Jeder Tisch bekommt einen eigenen QR-Code für die Speisekarte, ganz ohne Reservierungsdaten preiszugeben.</p></div>
+            </div>
+            <div class="landing-more-item">
+              <span class="mark" aria-hidden="true">✓</span>
+              <div><h3>Digitale Rechnungen</h3><p>Beleg per QR-Code öffnen, speichern und optional direkt Trinkgeld geben.</p></div>
+            </div>
+            <div class="landing-more-item">
+              <span class="mark" aria-hidden="true">✓</span>
+              <div><h3>Kassenführung</h3><p>Kassenbuch mit Kassentag, Einlagen und Entnahmen sowie lückenloser Belegnummerierung.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-plans">
+        <div class="landing-plans-inner">
+          <p class="landing-kicker">Preise</p>
+          <h2>Kostenlos starten, bei Bedarf erweitern.</h2>
+          <p class="landing-plans-lead">Haviko läuft im Kern komplett kostenlos. Haviko+ lohnt sich erst, wenn dein Betrieb über die kostenlosen Grenzen hinauswächst oder du erweiterte Auswertungen brauchst.</p>
+          <div class="landing-plan-grid">
+            <div class="landing-plan">
+              <span class="landing-plan-name">Kostenlos</span>
+              <p class="landing-plan-price">0&nbsp;€ <small>/ Monat</small></p>
+              <p class="landing-plan-note">Für den täglichen Betrieb, ohne Zeitlimit.</p>
+              <ul class="landing-plan-list">
+                <li>Reservierungen, Tische und Bestellungen</li>
+                <li>Online-Reservierung, Gastportal und Kundenbindung</li>
+                <li>Bis zu 3 Mitarbeiter, davon 2 im Service und 1 in der Küche</li>
+                <li>1 Station und 1 digitales Gerät</li>
+                <li>Kassenbuch und digitale Rechnungen</li>
+              </ul>
+            </div>
+            <div class="landing-plan is-plus">
+              <span class="landing-plan-name">Haviko+</span>
+              <p class="landing-plan-price">Auf Anfrage</p>
+              <p class="landing-plan-note">Für wachsende Betriebe mit mehr Team und mehr Auswertungen.</p>
+              <ul class="landing-plan-list">
+                <li>Mehr Mitarbeiter, Service- und Küchenkräfte</li>
+                <li>Mehr Stationen und digitale Geräte</li>
+                <li>Umsatz-, Produkt-, Mitarbeiter-, Schicht- und Reservierungsanalysen</li>
+                <li>Datenexport</li>
+                <li>Eigene Gutscheincodes und Gutschein-Gestaltung</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
