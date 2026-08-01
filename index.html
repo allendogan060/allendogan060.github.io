@@ -348,7 +348,7 @@
 
     .landing-feature-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -383,6 +383,154 @@
       margin: 0;
       color: var(--muted);
       line-height: 1.55;
+    }
+
+    .landing-apps {
+      padding: 64px 22px 78px;
+      background: var(--background);
+    }
+
+    .landing-apps-inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+    }
+
+    .landing-apps h2 {
+      max-width: 650px;
+      margin: 0 0 30px;
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1.08;
+    }
+
+    .landing-app-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .landing-app-card {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .landing-app-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 13px;
+    }
+
+    .landing-app-card h3 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .landing-app-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .landing-app-card a {
+      align-self: flex-start;
+      margin-top: 4px;
+      padding: 10px 16px;
+      border-radius: 7px;
+      border: 1px solid var(--action);
+      color: var(--action);
+      font-weight: 780;
+      text-decoration: none;
+    }
+
+    .landing-plus {
+      padding: 70px 22px 82px;
+      color: white;
+      background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 100%);
+    }
+
+    .landing-plus-inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 40px;
+      align-items: center;
+    }
+
+    .landing-plus h2 {
+      margin: 0 0 14px;
+      font-size: clamp(30px, 5vw, 44px);
+      line-height: 1.08;
+    }
+
+    .landing-plus .landing-kicker { color: #91e0ca; }
+
+    .landing-plus p.landing-lead {
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0 0 24px;
+    }
+
+    .landing-plus-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .landing-plus-list li {
+      padding-left: 26px;
+      position: relative;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .landing-plus-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #91e0ca;
+      font-weight: 800;
+    }
+
+    .landing-footer {
+      padding: 46px 22px;
+      background: var(--forest-deep);
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .landing-footer-inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .landing-footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .landing-footer-links a {
+      color: rgba(255, 255, 255, 0.75);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .landing-footer-links a:hover { color: white; }
+
+    @media (max-width: 720px) {
+      .landing-app-grid { grid-template-columns: 1fr; }
+      .landing-plus-inner { grid-template-columns: 1fr; }
     }
 
     .hero {
@@ -1415,11 +1563,75 @@
             <article class="landing-feature">
               <span class="landing-feature-mark" aria-hidden="true">4</span>
               <h3>Gastportal</h3>
-              <p>Gäste öffnen Reservierungen, digitale Rechnungen, Feedback und Stempelkarten über persönliche Links.</p>
+              <p>Gäste öffnen Reservierungen, digitale Rechnungen, Feedback und Stempelkarten über persönliche Links oder die eigene Gastportal-App.</p>
+            </article>
+            <article class="landing-feature">
+              <span class="landing-feature-mark" aria-hidden="true">5</span>
+              <h3>Team-Chat</h3>
+              <p>1-zu-1-Chats und Gruppenchats fürs Team direkt in Haviko, mit Lesebestätigungen und privatem Nachrichtenverlauf.</p>
+            </article>
+            <article class="landing-feature">
+              <span class="landing-feature-mark" aria-hidden="true">6</span>
+              <h3>Kontosicherheit</h3>
+              <p>Zwei-Faktor-Authentifizierung per E-Mail-Code oder Passkey schützt Restaurant- und Mitarbeiterkonten zusätzlich.</p>
             </article>
           </div>
         </div>
       </section>
+
+      <section class="landing-apps">
+        <div class="landing-apps-inner">
+          <p class="landing-kicker">Zwei Apps, ein System</p>
+          <h2>Für Betrieb und Gäste, jeweils die passende App.</h2>
+          <div class="landing-app-grid">
+            <article class="landing-app-card">
+              <img class="landing-app-icon" src="./assets/haviko-app-icon.png" alt="">
+              <h3>Haviko: Kasse &amp; Restaurant</h3>
+              <p>Für Restaurantleitung und Team: Tische, Bestellungen, Küche, Reservierungen, Schichten, Team-Chat und Auswertungen an einem Ort.</p>
+              <a href="https://apps.apple.com/app/id6794772408">Im App Store ansehen</a>
+            </article>
+            <article class="landing-app-card">
+              <img class="landing-app-icon" src="./assets/haviko-guest-app-icon.png" alt="">
+              <h3>Haviko Gastportal</h3>
+              <p>Für Gäste: persönlicher QR-Code, Stempelkarte, Gutscheine, digitale Rechnungen und Besuchsverlauf bei allen Haviko-Restaurants.</p>
+              <a href="https://apps.apple.com/app/id6796907761">Im App Store ansehen</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-plus">
+        <div class="landing-plus-inner">
+          <div>
+            <p class="landing-kicker">Haviko+</p>
+            <h2>Mehr Funktionen für wachsende Restaurants.</h2>
+            <p class="landing-lead">
+              Die Grundfunktionen von Haviko sind für jedes Restaurant kostenlos.
+              Haviko+ schaltet erweiterte Funktionen frei, sobald dein Betrieb wächst.
+            </p>
+            <a class="primary-link" href="https://login.haviko.de/?mode=register" style="display:inline-flex;min-height:48px;padding:12px 18px;border-radius:7px;font-weight:800;text-decoration:none;background:white;color:var(--forest-deep);">Kostenlos starten</a>
+          </div>
+          <ul class="landing-plus-list">
+            <li>Zusätzliche Mitarbeitende und Geräte über das Grundkontingent hinaus</li>
+            <li>Erweiterte Analysen und Auswertungen</li>
+            <li>Datenexporte für Buchhaltung und Controlling</li>
+            <li>Individuelle Gutscheine und Treueaktionen</li>
+            <li>Priorisierter Support</li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="landing-footer">
+        <div class="landing-footer-inner">
+          <span>© 2026 Haviko · Sicherer Restaurantbetrieb</span>
+          <nav class="landing-footer-links" aria-label="Rechtliches und Support">
+            <a href="https://support.haviko.de/">Support</a>
+            <a href="https://haviko.de/#status">Systemstatus</a>
+            <a href="https://haviko.de/impressum">Impressum</a>
+            <a href="https://haviko.de/datenschutz">Datenschutz</a>
+          </nav>
+        </div>
+      </footer>
     </section>
 
     <header class="hero" id="hero">
