@@ -47,15 +47,15 @@
       z-index: 0;
       pointer-events: none;
       display: grid;
-      grid-template-columns: repeat(9, 1fr);
-      gap: 34px;
+      grid-template-columns: repeat(14, 1fr);
+      gap: 18px;
       transform: rotate(8deg);
       opacity: 0.05;
     }
 
     .pattern-col {
       display: grid;
-      gap: 34px;
+      gap: 18px;
       animation: drift-up 26s linear infinite;
     }
 
@@ -64,8 +64,8 @@
     }
 
     .pattern-col svg {
-      width: 40px;
-      height: 40px;
+      width: 64px;
+      height: 64px;
       color: var(--forest);
     }
 
@@ -174,7 +174,7 @@
         <path d="M17 12v10"></path>
       </svg>`;
       const container = document.getElementById("pattern");
-      const columns = 9;
+      const columns = 14;
       const rows = 8;
       for (let c = 0; c < columns; c += 1) {
         const col = document.createElement("div");
