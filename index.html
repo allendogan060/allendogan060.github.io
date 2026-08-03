@@ -498,36 +498,6 @@
       font-weight: 800;
     }
 
-    .landing-footer {
-      padding: 46px 22px;
-      background: var(--forest-deep);
-      color: rgba(255, 255, 255, 0.75);
-    }
-
-    .landing-footer-inner {
-      width: min(100%, var(--content));
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .landing-footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 18px;
-    }
-
-    .landing-footer-links a {
-      color: rgba(255, 255, 255, 0.75);
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    .landing-footer-links a:hover { color: white; }
-
     @media (max-width: 720px) {
       .landing-app-grid { grid-template-columns: 1fr; }
       .landing-plus-inner { grid-template-columns: 1fr; }
@@ -1256,29 +1226,36 @@
       width: min(100%, var(--content));
       margin: 0 auto;
       display: flex;
-      align-items: flex-start;
+      flex-wrap: wrap;
+      align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      gap: 6px 18px;
     }
 
     .footer-brand {
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.5;
     }
 
     .footer-brand strong {
-      display: block;
       color: var(--forest-deep);
-      font-size: 15px;
+      font-weight: 800;
     }
 
     .footer-links {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 10px 18px;
+      justify-content: center;
+      gap: 14px;
       font-size: 13px;
+    }
+
+    .footer-links button {
+      color: var(--muted);
+    }
+
+    .footer-links button:hover {
+      color: var(--forest-deep);
     }
 
     .legal-dialog {
@@ -1621,15 +1598,14 @@
         </div>
       </section>
 
-      <footer class="landing-footer">
-        <div class="landing-footer-inner">
-          <span>© 2026 Haviko · Sicherer Restaurantbetrieb</span>
-          <nav class="landing-footer-links" aria-label="Rechtliches und Support">
-            <a href="https://support.haviko.de/">Support</a>
-            <a href="https://haviko.de/#status">Systemstatus</a>
-            <a href="https://haviko.de/impressum">Impressum</a>
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <span class="footer-brand"><strong>Haviko</strong></span>
+          <div class="footer-links">
             <a href="https://haviko.de/datenschutz">Datenschutz</a>
-          </nav>
+            <a href="https://haviko.de/impressum">Impressum</a>
+            <a href="https://support.haviko.de/">Support</a>
+          </div>
         </div>
       </footer>
     </section>
@@ -1979,18 +1955,11 @@
 
     <footer class="site-footer">
       <div class="footer-inner">
-        <div class="footer-brand">
-          <strong>Reservierung mit Haviko</strong>
-          Sichere Restaurantorganisation und Online-Reservierungen.
-        </div>
+        <span class="footer-brand"><strong>Haviko</strong> Reservierungen</span>
         <div class="footer-links">
-          <a href="https://login.haviko.de/">Haviko Web</a>
-          <button type="button" data-legal="support">Support</button>
-          <button type="button" data-legal="veroeffentlichung">Veröffentlichung</button>
-          <button type="button" data-legal="impressum">Impressum</button>
           <button type="button" data-legal="datenschutz">Datenschutz</button>
-          <button type="button" data-legal="nutzungsbedingungen">Nutzungsbedingungen</button>
-          <button type="button" data-legal="agb">AGB</button>
+          <button type="button" data-legal="impressum">Impressum</button>
+          <button type="button" data-legal="support">Support</button>
         </div>
       </div>
     </footer>
