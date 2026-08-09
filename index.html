@@ -18,6 +18,19 @@
   <link rel="shortcut icon" type="image/png" href="./assets/favicon-48.png?v=7">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=7">
   <link rel="manifest" href="./site.webmanifest?v=7">
+  <script>
+    (() => {
+      const hasAccess = document.cookie
+        .split(";")
+        .map((value) => value.trim())
+        .some((value) => value === "haviko_preview_access=granted");
+      if (!hasAccess && window.location.hostname !== "localhost") {
+        window.location.replace(
+          `https://autorisieren.haviko.de/?next=${encodeURIComponent(window.location.href)}`
+        );
+      }
+    })();
+  </script>
   <title>Haviko | Restaurantsoftware</title>
   <style>
     :root {
