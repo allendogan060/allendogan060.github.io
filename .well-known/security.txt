@@ -1,0 +1,3 @@
+Contact: mailto:support@haviko.de
+Preferred-Languages: de, en
+Canonical: https://haviko.de/.well-known/security.txt
